@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Технические обслуживания (ТО)</title>
+    <link rel="stylesheet" th:href="@{/css/list_styles.css}">
+    <link rel="stylesheet" th:href="@{/css/header_style.css}"/>
+</head>
+
+<body>
+    <div th:replace="~{fragments/header :: header}"></div>
+<div class="container">
+
+    <div class="main-content">
+        <form class="filters-section" action="/maintenance" method="get">
+            <h2>Поиск ТО</h2>
+
+            <!--Filtering options-->
+            <div class="filter-group">
+                <label for="periodTypeFilter">Период проведения</label>
+                <input type="text" name="period" th:value="${period}" id="periodTypeFilter"
+                       placeholder="Введите искомый период проведения (~'1day')...">
+            </div>
+            <!--Selected Type card-->
+            <div class="filter-group" th:if="${selectedType != null}">
+                <label for="selectedType">Выбранный тип объявления</label>
+                <div id="selectedType" class="card">
+                    <div class="pagination">
+                        <a class="cancel-btn"
+                           th:href="@{/maintenance(
+                           page=0,
+                           perPage=${maintenance.size},
+                           typeName=${typeName},
+                           period=${period},
+                           workDescription=${workDescription}
+                           )}">Отменить
+                        </a>
+                    </div>
+                    <div class="card-id" th:text="${selectedType.id}">1</div>
+                    <div class="card-name" th:text="${selectedType.name}"></div>
+                    <div class="codes-list">
+                        <span class="code-item" th:text="'Период проведения: ' + ${selectedType.period}"></span>
+                    </div>
+                </div>
+
+                <input type="hidden" name="type" th:value="${selectedType.id}"/>
+            </div>
+            <div class="filter-group" th:unless="${selectedType != null}">
+                <label for="nameFilter">Имя усройства</label>
+                <input type="text" name="typeName" th:value="${typeName}" id="nameFilter"
+                       placeholder="Введите наименование ТО...">
+            </div>
+
+            <!--Pagination-->
+            <div class="filter-group">
+
+                <label for="pageSize">Количество элементов на странице</label>
+                <select id="pageSize" name="perPage">
+                    <option value="10" th:selected="${maintenance.size == 10}">10</option>
+                    <option value="15" th:selected="${maintenance.size == 15}">15</option>
+                    <option value="30" th:selected="${maintenance.size == 30}">30</option>
+                </select>
+            </div>
+            <input type="hidden" value="0" name="page">
+            <input type="hidden" th:value="${machineId}" name="machine">
+
+            <div class="pagination">
+                <button class="filter-btn" type="submit">
+                    Применить фильтры
+                </button>
+            </div>
+        </form>
+
+        <section class="cards-section">
+            <div class="cards-container">
+                <!--Show cards-->
+                <div class="card" th:each="maintenanceRec : ${maintenance.content}"
+                     th:data-url="@{maintenance/records(machine=${machineId}, maintenance=${maintenanceRec.id})}"
+                     onclick="window.location.href = this.getAttribute('data-url');">
+                    <div class="pagination">
+                        <a th:if="${#authorization.expression('hasAuthority(''STUFF'')')}"
+                           th:href="@{/maintenance(
+                           page=${maintenance.number},
+                           perPage=${maintenance.size},
+                           type=${selectedType != null ? selectedType.id : null},
+                           maintenance=${maintenanceRec.id},
+                           typeName=${typeName},
+                           period=${period},
+                           machine=${machineId},
+                           workDescription=${workDescription})}">
+                            Изменить
+                        </a>
+                        <a th:if="${#authorization.expression('hasAuthority(''STUFF'')')}"
+                           th:href="@{/maintenance/delete/{id}(id=${maintenanceRec.id})}">
+                            Удалить
+                        </a>
+                    </div>
+                    <div th:replace="fragments/cards/maintenance :: cardBody(maintenanceRec)}"></div>
+                </div>
+            </div>
+
+            <div class="pagination">
+                <a th:href="@{/maintenance(
+                           page=0,
+                           perPage=${maintenance.size},
+                           type=${selectedType != null ? selectedType.id : null},
+                           maintenance=${selectedMaintenance != null ? selectedMaintenance.id : null},
+                           typeName=${typeName},
+                           period=${period},
+                           machine=${machineId},
+                           workDescription=${workDescription})}">
+                    Первая
+                </a>
+                <a th:if="${maintenance.totalPages > 1}" th:href="@{/maintenance(
+                           page=${maintenance.totalPages-1},
+                           perPage=${maintenance.size},
+                           type=${selectedType != null ? selectedType.id : null},
+                           maintenance=${selectedMaintenance != null ? selectedMaintenance.id : null},
+                           typeName=${typeName},
+                           period=${period},
+                           machine=${machineId},
+                           workDescription=${workDescription})}">
+                    Последняя
+                </a>
+
+                <div class="page-info">
+                    Страница <span th:text="${maintenance.number + 1}">1</span> из <span
+                        th:text="${maintenance.totalPages}">10</span>
+                </div>
+
+                <a th:if="${maintenance.hasNext()}"
+                   th:href="@{/maintenance(
+                           page=${maintenance.totalPages+1},
+                           perPage=${maintenance.size},
+                           type=${selectedType != null ? selectedType.id : null},
+                           maintenance=${selectedMaintenance != null ? selectedMaintenance.id : null},
+                           typeName=${typeName},
+                           period=${period},
+                           machine=${machineId},
+                           workDescription=${workDescription})}">
+                    Следующая
+                </a>
+                <a th:if="${maintenance.hasPrevious()}"
+                   th:href="@{/maintenance(
+                           page=${maintenance.totalPages-1},
+                           perPage=${maintenance.size},
+                           type=${selectedType != null ? selectedType.id : null},
+                           maintenance=${selectedMaintenance != null ? selectedMaintenance.id : null},
+                           typeName=${typeName},
+                           period=${period},
+                           machine=${machineId},
+                           workDescription=${workDescription})}">
+                    Предыдущая
+                </a>
+            </div>
+        </section>
+
+        <section th:if="${selectedMaintenance != null and #authorization.expression('hasAuthority(''STUFF'')')}">
+            <form action="#" th:object="${selectedMaintenance}" class="filters-section" th:action="@{/maintenance/save}"
+                  method="post">
+                <div class="filter-group">
+                    <label for="maintenanceNameInput">Описание работ</label>
+                    <input id="maintenanceNameInput" th:field="*{workDescription}" type="text"/>
+                    <div th:if="${#fields.hasErrors('workDescription')}" style="color:red;">
+                        <span th:errors="*{workDescription}"></span>
+                    </div>
+                </div>
+                <input type="hidden" th:field="*{type}"/>
+                <input type="hidden" th:field="*{id}"/>
+                <button class="filter-btn" type="submit">
+                    Подтвердить
+                </button>
+                <button class="cancel-btn" type="reset" onclick="window.location.reload();">
+                    Отменить
+                </button>
+            </form>
+        </section>
+    </div>
+</div>
+</body>
+</html>

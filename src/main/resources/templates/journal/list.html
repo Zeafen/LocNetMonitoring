@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Жунрал</title>
+    <link rel="stylesheet" th:href="@{/css/list_styles.css}">
+    <link rel="stylesheet" th:href="@{/css/header_style.css}"/>
+</head>
+
+<body>
+<div th:replace="~{fragments/header :: header}"></div>
+<div class="container">
+
+    <div class="main-content">
+        <form class="filters-section" action="/journal" method="get">
+            <h2>Поиск записей журнала</h2>
+
+            <!--Filtering options-->
+            <div class="filter-group">
+                <label for="requestTypeFilter">Тип запроса</label>
+                <input type="text" name="requestType" th:value="${requestType}" id="requestTypeFilter"
+                       placeholder="Введите искомый тип запроса...">
+            </div>
+            <div class="filter-group">
+                <label for="isSucceedFilter">Результат запроса</label>
+                <select id="isSucceedFilter" name="succeed">
+                    <option value="">Выберите из списка</option>
+                    <option value="false" th:selected="${succeed == false}">Успешен</option>
+                    <option value="true" th:selected="${succeed == true}">Провален</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="contentTypeFilter">Тип данных запроса</label>
+                <input type="text" name="contentType" th:value="${contentType}" id="contentTypeFilter"
+                       placeholder="Введите искомый тип данных запроса...">
+            </div>
+            <div class="filter-group">
+                <label for="codeNumberFilter">Номер кода ответа</label>
+                <input type="text" name="codeNumber" th:value="${codeNumber}" id="codeNumberFilter"
+                       placeholder="Введите номер кода ответа...">
+            </div>
+            <div class="filter-group">
+                <label for="outcomingFilter">Направление запроса</label>
+                <select id="outcomingFilter" name="outcoming">
+                    <option value="">Выберите из списка</option>
+                    <option value="false" th:selected="${outcoming == false}">Входящие</option>
+                    <option value="true" th:selected="${outcoming == true}">Исходящие</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="sentFromFilter">Начало периода отправки/получения запроса в работу</label>
+                <input type="datetime-local" name="sentFrom" th:value="${sentFrom}"
+                       id="sentFromFilter"/>
+            </div>
+            <div class="filter-group">
+                <label for="sentToFilter">Окончание периода отправки/получения запроса в работу</label>
+                <input type="datetime-local" name="sentTo" th:value="${sentTo}"
+                       id="sentToFilter"/>
+            </div>
+            <div class="filter-group">
+                <label for="orderingSelect">Сортировка по дате отправки</label>
+                <select th:value="${orderByDate}" name="orderByDate" id="orderingSelect">
+                    <option value="">Нет</option>
+                    <option value="true">По возрастанию</option>
+                    <option value="false">По убыванию</option>
+                </select>
+            </div>
+            <!--Selected Machine card-->
+            <div class="filter-group" th:if="${selectedMachine != null}">
+                <label for="selectedMachineCard">Выбранное устройство</label>
+                <div id="selectedMachineCard" class="card">
+                    <div class="pagination">
+                        <a class="cancel-btn"
+                           th:href="@{/journal(
+                           page=${journal.number},
+                           perPage=${journal.size},
+                           machine=${machineName},
+                           requestType=${requestType},
+                           succeed=${succeed},
+                           contentType=${contentType},
+                           codeNumber=${codeNumber},
+                           outcoming=${outcoming},
+                           sentFrom=${sentFrom},
+                           sentTo=${sentTo},
+                           orderByDate=${orderByDate},
+                           )}"> Отменить
+                        </a>
+                    </div>
+                    <div class="card-id" th:text="${selectedMachine.id}">1</div>
+                    <div class="card-name" th:text="${selectedMachine.name}">Наименование</div>
+                    <div class="codes-list">
+                        <span class="code-item" th:text="'Адрес: ' + ${selectedMachine.address}">Адрес устройства</span>
+                        <span class="code-item"
+                              th:text="'Серийный номер: ' + ${selectedMachine.serialNumber}">Серийный номер</span>
+                        <span class="code-item"
+                              th:text="'Дата сборки: ' + ${selectedMachine.dateProduced}">Дата сборки</span>
+                        <span class="code-item"
+                              th:text="'Дата принятия: ' + ${selectedMachine.dateCommissioning}">Дата принятия</span>
+                        <span class="code-item"
+                              th:text="'Модель: ' + ${selectedMachine.model.name}">Модель устройства</span>
+                        <span class="code-item"
+                              th:text="'Тип устройства: ' + ${selectedMachine.model.type.name}">Тип устройства</span>
+                    </div>
+                </div>
+
+                <input type="hidden" name="machineId" th:value="${selectedMachine.id}"/>
+            </div>
+            <div class="filter-group" th:unless="${selectedMachine != null}">
+                <label for="nameFilter">Имя усройства</label>
+                <input type="text" name="machine" th:value="${machineName}" id="nameFilter"
+                       placeholder="Введите наименование устройства...">
+            </div>
+
+            <!--Pagination-->
+            <div class="filter-group">
+
+                <label for="pageSize">Количество элементов на странице</label>
+                <select id="pageSize" name="perPage">
+                    <option value="10" th:selected="${journal.size == 10}">10</option>
+                    <option value="15" th:selected="${journal.size == 15}">15</option>
+                    <option value="30" th:selected="${journal.size == 30}">30</option>
+                </select>
+            </div>
+            <input type="hidden" value="0" name="page">
+
+            <div class="pagination">
+                <button class="filter-btn" type="submit">Применить фильтры</button>
+            </div>
+        </form>
+
+        <section class="cards-section">
+            <table>
+                <thead>
+                <th>Идентификатор записи</th>
+                <th>Идентификатор сессиии</th>
+                <th>Тип устройства</th>
+                <th>Модель устройства</th>
+                <th>Идентификатор устройства</th>
+                <th>Устройство</th>
+                <th>Адрес устройства</th>
+                <th>Серийный номер устройства</th>
+                <th>Направление</th>
+                <th>Тип запроса</th>
+                <th>Код ответа</th>
+                <th>Результат запроса</th>
+                <th>Текст кода ответа</th>
+                <th>Данные запроса</th>
+                <th>Тип данных запроса</th>
+                <th>Время отправки</th>
+                </thead>
+                <tbody>
+                <tr th:each="journalRec : ${journal}">
+                    <td><span th:text="${journalRec.id}"></span></td>
+                    <td><span th:text="${journalRec.sessionId}"></span></td>
+                    <td><span th:text="${journalRec.machineTypeName}"></span></td>
+                    <td><span th:text="${journalRec.modelName}"></span></td>
+                    <td><span th:text="${journalRec.machineId}"></span></td>
+                    <td><span th:text="${journalRec.machineName}"></span></td>
+                    <td><span th:text="${journalRec.address}"></span></td>
+                    <td><span th:text="${journalRec.serialNumber}"></span></td>
+                    <td>
+                        <span th:if="${journalRec.outcoming == true}">Исходящий</span>
+                        <span th:unless="${journalRec.outcoming == true}">Входящий</span>
+                    </td>
+                    <td><span th:text="${journalRec.requestTypeName}"></span></td>
+                    <td><span th:text="${journalRec.codeNumber}"></span></td>
+                    <td>
+                        <span th:if="${journalRec.succeed == true}">Успешен</span>
+                        <span th:unless="${journalRec.succeed == true}">Провален</span>
+                    </td>
+                    <td><span th:text="${journalRec.text}"></span></td>
+                    <td><span th:text="${journalRec.requestData}"></span></td>
+                    <td><span th:text="${journalRec.contentType}"></span></td>
+                    <td><span th:text="${journalRec.sentTime}"></span></td>
+                </tr>
+                </tbody>
+            </table>
+
+            <div class="pagination">
+                <a th:href="@{/journal(
+                           page=0,
+                           perPage=${journal.size},
+                           machine=${machineName},
+                           requestType=${requestType},
+                           succeed=${succeed},
+                           contentType=${contentType},
+                           codeNumber=${codeNumber},
+                           outcoming=${outcoming},
+                           sentFrom=${sentFrom},
+                           sentTo=${sentTo},
+                           orderByDate=${orderByDate},
+                           )}">Первая</a>
+                <a th:if="${journal.totalPages} > 0" th:href="@{/journal(
+                           page=${journal.totalPages-1},
+                           perPage=${journal.size},
+                           machine=${machineName},
+                           requestType=${requestType},
+                           succeed=${succeed},
+                           contentType=${contentType},
+                           codeNumber=${codeNumber},
+                           outcoming=${outcoming},
+                           sentFrom=${sentFrom},
+                           sentTo=${sentTo},
+                           orderByDate=${orderByDate},
+                           )}">Последняя</a>
+
+                <div class="page-info">
+                    Страница <span th:text="${journal.number + 1}">1</span> из <span
+                        th:text="${journal.totalPages}">10</span>
+                </div>
+
+                <a th:if="${journal.hasNext()}"
+                   th:href="@{/journal(
+                           page=${journal.number+1},
+                           perPage=${journal.size},
+                           machine=${machineName},
+                           requestType=${requestType},
+                           succeed=${succeed},
+                           contentType=${contentType},
+                           codeNumber=${codeNumber},
+                           outcoming=${outcoming},
+                           sentFrom=${sentFrom},
+                           sentTo=${sentTo},
+                           orderByDate=${orderByDate},
+                           )}">Следующая</a>
+                <a th:if="${journal.hasPrevious()}"
+                   th:href="@{/journal(
+                           page=${journal.number-1},
+                           perPage=${journal.size},
+                           machine=${machineName},
+                           requestType=${requestType},
+                           succeed=${succeed},
+                           contentType=${contentType},
+                           codeNumber=${codeNumber},
+                           outcoming=${outcoming},
+                           sentFrom=${sentFrom},
+                           sentTo=${sentTo},
+                           orderByDate=${orderByDate},
+                           )}">Предыдущая </a>
+            </div>
+        </section>
+    </div>
+</div>
+</body>
+</html>

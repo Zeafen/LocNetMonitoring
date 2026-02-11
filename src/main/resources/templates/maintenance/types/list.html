@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Технические обслуживания (ТО)</title>
+    <link rel="stylesheet" th:href="@{/css/list_styles.css}">
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>Список ТО</h1>
+    </header>
+
+    <div class="main-content">
+        <form class="filters-section" action="/maintenance/types" method="get">
+            <h2>Поиск ТО</h2>
+
+            <!--Filtering options-->
+            <div class="filter-group">
+                <label for="periodTypeFilter">Период проведения</label>
+                <input type="text" name="period" th:value="${period}" id="periodTypeFilter"
+                       placeholder="Введите искомый период проведения (~'1day')...">
+            </div>
+            <!--Selected Machine card-->
+            <div class="filter-group">
+                <label for="nameFilter">Имя усройства</label>
+                <input type="text" name="typeName" th:value="${typeName}" id="nameFilter"
+                       placeholder="Введите наименование типа ТО...">
+            </div>
+
+            <!--Pagination-->
+            <div class="filter-group">
+
+                <label for="pageSize">Количество элементов на странице</label>
+                <select id="pageSize" name="perPage">
+                    <option value="10" th:selected="${types.size == 10}">10</option>
+                    <option value="15" th:selected="${types.size == 15}">15</option>
+                    <option value="30" th:selected="${types.size == 30}">30</option>
+                </select>
+            </div>
+            <input type="hidden" value="0" name="page">
+
+            <div class="pagination">
+                <button class="filter-btn" type="submit">
+                    Применить фильтры
+                </button>
+            </div>
+        </form>
+
+        <section class="cards-section">
+            <div class="cards-container">
+                <!--Show cards-->
+                <div class="card" th:each="type : ${types.content}"
+                     th:data-url="@{maintenance(type=${type.id}"
+                     onclick="window.location.href = this.getAttribute('data-url');">
+                    <div class="pagination">
+                        <a th:if="${#authorization.expression('hasAuthority(''STUFF'')')}"
+                           th:href="@{/maintenance/types(
+                           page=${types.number},
+                           perPage=${types.size},
+                           type=${type.id},
+                           typeName=${typeName},
+                           period=${period})}">
+                            Изменить
+                        </a>
+                        <a th:if="${#authorization.expression('hasAuthority(''STUFF'')')}"
+                           th:href="@{/maintenance/types/delete/{id}(id=${type.id})}">
+                            Удалить
+                        </a>
+                    </div>
+                    <div class="card-id" th:text="${type.id}">1</div>
+                    <div class="card-name" th:text="${type.name}"></div>
+                    <div class="codes-list">
+                        <span class="code-item" th:text="'Период проведения: ' + ${type.period}"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pagination">
+                <a th:href="@{/maintenance/types(
+                           page=0,
+                           perPage=${types.size},
+                           type=${selectedType != null ? selectedType.id : null},
+                           typeName=${typeName},
+                           period=${period})}">
+                    Первая
+                </a>
+                <a th:if="${types.totalPages} > 0" th:href="@{/maintenance/types(
+                           page=${types.totalPages-1},
+                           perPage=${types.size},
+                           type=${selectedType != null ? selectedType.id : null},
+                           typeName=${typeName},
+                           period=${period})}">
+                    Последняя
+                </a>
+
+                <div class="page-info">
+                    Страница <span th:text="${types.number + 1}">1</span> из <span
+                        th:text="${types.totalPages}">10</span>
+                </div>
+
+                <a th:if="${types.hasNext()}"
+                   th:href="@{/maintenance/types(
+                           page=${types.totalPages+1},
+                           perPage=${types.size},
+                           type=${selectedType != null ? selectedType.id : null},
+                           typeName=${typeName},
+                           period=${period})}">
+                    Следующая
+                </a>
+                <a th:if="${types.hasPrevious()}"
+                   th:href="@{/maintenance/types(
+                           page=${types.totalPages-1},
+                           perPage=${types.size},
+                           type=${selectedType != null ? selectedType.id : null},
+                           typeName=${typeName},
+                           period=${period})}">
+                    Предыдущая
+                </a>
+            </div>
+        </section>
+
+        <section th:if="${selectedType != null and #authorization.expression('hasAuthority(''STUFF'')')}">
+            <form action="#" th:object="${selectedType}" class="filters-section" th:action="@{/maintenance/types/save}"
+                  method="post">
+                <div class="filter-group">
+                    <label for="typeNameInput">Наименование типа</label>
+                    <input id="typeNameInput" th:field="*{name}" type="text"/>
+                    <div th:if="${#fields.hasErrors('name')}" style="color:red;">
+                        <span th:errors="*{name}"></span>
+                    </div>
+                </div>
+                <div class="filter-group">
+                    <label for="typePeriodInput">Период проведения ТО</label>
+                    <input id="typePeriodInput" th:field="*{period}" type="text"/>
+                    <div th:if="${#fields.hasErrors('period')}" style="color:red;">
+                        <span th:errors="*{period}"></span>
+                    </div>
+                </div>
+
+                <input type="hidden" th:field="*{id}"/>
+                <button class="filter-btn" type="submit">
+                    Подтвердить
+                </button>
+                <button class="cancel-btn" type="reset" onclick="window.location.reload();">
+                    Отменить
+                </button>
+            </form>
+        </section>
+    </div>
+</div>
+</body>
+</html>

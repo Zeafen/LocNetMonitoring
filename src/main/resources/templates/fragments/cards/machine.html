@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<meta charset="UTF-8">
+<body>
+<div th:fragment="cardBody(machine)">
+    <div class="card-id" th:text="${machine.id}">1</div>
+    <div class="card-name" th:text="${machine.name}"></div>
+    <div class="codes-list">
+        <span class="code-item" th:text="'Адрес: ' + ${machine.address}"></span>
+        <span class="code-item"
+              th:text="'Серийный номер: ' + ${machine.serialNumber}"></span>
+        <span class="code-item" th:text="'Дата сборки: ' + ${machine.dateProduced}"></span>
+        <span class="code-item"
+              th:text="'Дата принятия: ' + ${machine.dateCommissioning}"></span>
+        <span class="code-item" th:text="'Модель: ' + ${machine.model.name}"></span>
+        <span class="code-item" th:text="'Количество лет использования: ' + ${machine.model.yearsExpire}"></span>
+        <span class="code-item"
+              th:text="'Тип устройства: ' + ${machine.model.type.name}"></span>
+    </div>
+</div>
+</body>
+</html>

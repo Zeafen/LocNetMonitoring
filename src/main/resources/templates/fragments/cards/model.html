@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<meta charset="UTF-8">
+<body>
+<div th:fragment="cardBody(machineModel)">
+    <div class="card-id" th:text="${machineModel.id}">1</div>
+    <div class="card-name" th:text="${machineModel.name}"></div>
+    <div class="codes-list">
+                        <span class="code-item"
+                              th:text="'Тип устройства: ' + ${machineModel.type.name}"></span>
+        <span class="code-item"
+              th:text="'Количество лет использования: ' + ${machineModel.yearsExpire}"></span>
+    </div>
+</div>
+</body>
+</html>

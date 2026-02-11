@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Machine info</title>
+    <link rel="stylesheet" th:href="@{/css/list_styles.css}">
+    <link rel="stylesheet" th:href="@{/css/header_style.css}">
+</head>
+
+<body>
+<div th:replace="~{fragments/header :: header}"></div>
+<div class="container">
+
+    <div class="tabs-container">
+        <div class="tabs">
+            <div class="tab" data-tab="info-tab">Общие сведения</div>
+            <div class="tab" data-tab="stats-tab" th:if="${stats} != null">Статистика</div>
+            <div class="tab" data-tab="mtc_summary-tab">Общие сведения о Техническом обслуживании(ТО)</div>
+            <div class="tab"><a th:href="@{/journal(machineId=${machineModel.id})}">Журнал сообщений</a></div>
+        </div>
+    </div>
+
+    <div class="tab-content active" id="info-tab">
+        <div class="info-content">
+            <h2 th:text="'Устройство ' + ${machineModel.id}">Устройство</h2>
+            <div class="info-grid">
+                <div class="info-card">
+                    <h3>Технические параметры</h3>
+                    <p th:text="'Серийный номер устройства: ' + ${machineModel.serialNumber}"></p>
+                    <p th:text="'Дата сборки: ' + ${machineModel.dateProduced}">Дата сборки</p>
+                    <p th:text="'Дата принятия в работу: ' + ${machineModel.dateCommissioning}">Дата принятия в
+                        работу</p>
+                    <p th:text="'Модель: ' + ${machineModel.model.name}">Модель устройства</p>
+                    <p th:text="'Тип: ' + ${machineModel.model.type.name}">Тип устройства</p>
+                </div>
+            </div>
+
+            <div class="info-grid">
+                <div class="info-card">
+                    <h3>Программные параметры</h3>
+                    <h3 th:text="'Наименование устройства: ' + ${machineModel.name}">Наименование устройства</h3>
+                    <h3 th:text="'Адрес устройства: ' + ${machineModel.address}">Адрес устройства</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:if="${stats != null}" class="tab-content" id="stats-tab">
+        <div class="main-content">
+            <form class="filters-section" th:action="@{/machines/{id}(id=${machineModel.id})}" method="get">
+                <h1>Поиск статистичкеских данных</h1>
+
+                <div class="filter-group">
+                    <label for="dateFromFilter">Начало периода учёта</label>
+                    <input type="date" name="s_fromDay" th:value="${s_fromDay}" id="dateFromFilter">
+                </div>
+
+                <div class="filter-group">
+                    <label for="dateUntilFilter">Окончание периода учёта</label>
+                    <input type="date" name="s_untilDay" th:value="${s_untilDay}" id="dateUntilFilter">
+                </div>
+
+                <div class="filter-group">
+
+                    <label for="pageSize">Количество элементов на странице</label>
+                    <select id="pageSize" name="s_perPage">
+                        <option value="10" th:selected="${stats.size == 10}">10</option>
+                        <option value="15" th:selected="${stats.size == 15}">15</option>
+                        <option value="30" th:selected="${stats.size == 30}">30</option>
+                    </select>
+                </div>
+                <input type="hidden" value="0" name="s_page">
+
+                <div class="pagination">
+                    <button class="filter-btn" type="submit">
+                        Применить фильтры
+                    </button>
+                </div>
+            </form>
+
+            <!--Cards section-->
+            <section class="cards-section">
+                <table>
+                    <thead>
+                    <th>ID устройства</th>
+                    <th>Исходящие (true/false)</th>
+                    <th>Время отправки</th>
+                    <th>Процент успешных операций (succeedPercentage)</th>
+                    <th>Среднее количество обработанных данных за операцию (avgBytesOperated)</th>
+                    <th>Количество обработанных данных (bytesOperated)</th>
+                    <th>Количество операций (requestsCount)</th>
+                    <th>Частота обработки запросов в минуту (requestsFrequency)</th>
+                    </thead>
+                    <tbody>
+                    <tr th:each="statList : ${stats.content}">
+                        <td th:each="statItem: ${statList}">
+                            <div th:if="${statItem.level != null}" th:switch="${statItem.level}">
+                                        <span
+                                                th:case="${T(com.zeafen.LocNetMonitoring.domain.models.WarningLevels).LOW}"
+                                                style="color:green"
+                                                th:text="${statItem.value == null ? 'Нет даных' : statItem.value}"></span>
+                                <span
+                                        th:case="${T(com.zeafen.LocNetMonitoring.domain.models.WarningLevels).AVERAGE}"
+                                        style="color:orange"
+                                        th:text="${statItem.value == null ? 'Нет даных' : statItem.value}"></span>
+                                <span
+                                        th:case="${T(com.zeafen.LocNetMonitoring.domain.models.WarningLevels).CRITICAL}"
+                                        style="color:red"
+                                        th:text="${statItem.value == null ? 'Нет даных' : statItem.value}"></span>
+                            </div>
+                            <span th:unless="${statItem.level != null}"
+                                  th:text="${statItem.value == null ? 'Нет даных' : statItem.value}"></span>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+
+                <!--Bottom pagination layer-->
+                <div class="pagination">
+                    <a th:href="@{/machines/{id}(id=${machineModel.id},
+                    s_page=0,
+                    s_perPage=${stats.size},
+                    s_fromDay=${s_fromDay},
+                    s_untilDay=${s_untilDay})}">
+                        Первая
+                    </a>
+                    <a th:if="${stats.totalPages > 0}" th:href="@{/machines/{id}(id=${machineModel.id},
+                    s_page=${stats.totalPages-1},
+                    s_perPage=${stats.size},
+                    s_fromDay=${s_fromDay},
+                    s_untilDay=${s_untilDay})}">
+                        Последняя
+                    </a>
+
+                    <div th:if="${stats.totalPages > 0}" class="page-info">
+                        Страница <span th:text="${stats.number + 1}">1</span> из <span
+                            th:text="${stats.totalPages}">10</span>
+                    </div>
+
+                    <a th:if="${stats.hasNext()}" th:href="@{/machines/{id}(id=${machineModel.id},
+                    s_page=${stats.number+1},
+                    s_perPage=${stats.size},
+                    s_fromDay=${s_fromDay},
+                    s_untilDay=${s_untilDay})}">
+                        Следующая
+                    </a>
+                    <a th:if="${stats.hasPrevious()}" th:href="@{/machines/{id}(id=${machineModel.id},
+                    s_page=${stats.number-1},
+                    s_perPage=${stats.size},
+                    s_fromDay=${s_fromDay},
+                    s_untilDay=${s_untilDay})}">
+                        Предыдущая
+                    </a>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <div class="tab-content" id="mtc_summary-tab">
+        <div class="main-content">
+            <form class="filters-section" th:action="@{/machines/{id}(id=${machineModel.id})}" method="get">
+                <h1>Поиск статистичкеских данных</h1>
+
+                <div class="filter-group">
+
+                    <label for="pageSize">Количество элементов на странице</label>
+                    <select id="mtc_pageSize" name="mtc_perPage">
+                        <option value="10" th:selected="${maintenanceSummary.size == 10}">10</option>
+                        <option value="15" th:selected="${maintenanceSummary.size == 15}">15</option>
+                        <option value="30" th:selected="${maintenanceSummary.size == 30}">30</option>
+                    </select>
+                </div>
+                <input type="hidden" value="0" name="mtc_page">
+
+                <div class="pagination">
+                    <button class="filter-btn" type="submit">
+                        Применить фильтры
+                    </button>
+                </div>
+            </form>
+
+            <!--Cards section-->
+            <section class="cards-section">
+                <table>
+                    <thead>
+                    <th>ID Технического обслуживание (ТО)</th>
+                    <th>ID Типа ТО</th>
+                    <th>Наименование типа ТО</th>
+                    <th>Дата последнего ТО</th>
+                    <th>Дата следующего ТО (по графику)</th>
+                    <th>Период проведения</th>
+                    <th>Описание работ ТО</th>
+                    <th>Часота проведения ТО</th>
+                    </thead>
+                    <tbody>
+                    <tr th:each="summary : ${maintenanceSummary.content}">
+                        <td><span th:text="${summary.maintenanceId}"></span></td>
+                        <td><span th:text="${summary.machine_id}"></span></td>
+                        <td><span th:text="${summary.typeName}"></span></td>
+                        <td><span th:text="${summary.lastMaintenanceDate}"></span></td>
+                        <td><span th:text="${summary.nextMaintenanceDate}"></span></td>
+                        <td><span th:text="${summary.period}"></span></td>
+                        <td><span th:text="${summary.workDescription}"></span></td>
+                        <td><span th:text="${summary.maintenanceFrequency}"></span></td>
+                    </tr>
+                    </tbody>
+                </table>
+
+                <!--Bottom pagination layer-->
+                <div class="pagination">
+                    <a th:href="@{/machines/{id}(id=${machineModel.id},
+                    mtc_page=0,
+                    mtc_perPage=${maintenanceSummary.size})}">
+                        Первая
+                    </a>
+                    <a th:if="${maintenanceSummary.totalPages > 0}" th:href="@{/machines/{id}(id=${machineModel.id},
+                    mtc_page=${maintenanceSummary.totalPages-1},
+                    mtc_perPage=${maintenanceSummary.size})}">
+                        Последняя
+                    </a>
+
+                    <div th:if="${maintenanceSummary.totalPages > 0}" class="page-info">
+                        Страница <span th:text="${maintenanceSummary.number + 1}">1</span> из <span
+                            th:text="${maintenanceSummary.totalPages}">10</span>
+                    </div>
+
+                    <a th:if="${maintenanceSummary.hasNext()}" th:href="@{/machines/{id}(id=${machineModel.id},
+                    mtc_page=${maintenanceSummary.number+1},
+                    mtc_perPage=${maintenanceSummary.size})}">
+                        Следующая
+                    </a>
+                    <a th:if="${maintenanceSummary.hasPrevious()}" th:href="@{/machines/{id}(id=${machineModel.id},
+                    mtc_page=${maintenanceSummary.number-1},
+                    mtc_perPage=${maintenanceSummary.size})}">
+                        Предыдущая
+                    </a>
+                </div>
+            </section>
+        </div>
+    </div>
+</div>
+<script>
+    const tabs = document.querySelectorAll(".tab");
+    const contents = document.querySelectorAll(".tab-content");
+
+    tabs.forEach(tab => {
+        tab.addEventListener("click", () => {
+            tabs.forEach(t => t.classList.remove("active"));
+            contents.forEach(c => c.classList.remove("active"));
+
+            tab.classList.add("active");
+
+            document.getElementById(tab.getAttribute("data-tab")).classList.add("active");
+        });
+    });
+</script>
+</body>
+
+</html>

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<meta charset="UTF-8">
+<body>
+<div th:fragment="form(machineModel)">
+    <form action="#" th:object="${machineModel}" class="filters-section" th:action="@{/machines/save}"
+          method="post">
+        <div class="filter-group">
+            <label for="machineNameInput">Наименование устройства</label>
+            <input id="machineNameInput" th:field="*{name}" type="text"/>
+            <div th:if="${#fields.hasErrors('name')}" style="color:red;">
+                <span th:errors="*{name}"></span>
+            </div>
+        </div>
+
+        <div class="filter-group">
+            <label for="machineAddressInput">Адрес устройства</label>
+            <input id="machineAddressInput" th:field="*{address}" type="text"/>
+            <div th:if="${#fields.hasErrors('address')}" style="color:red;">
+                <span th:errors="*{address}"></span>
+            </div>
+        </div>
+
+        <div class="filter-group">
+            <span>Серийный номер устройства:
+                <span th:text="${machineModel.serialNumber}"></span>
+            </span>
+            <input th:field="*{serialNumber}" type="hidden"/>
+        </div>
+
+        <div class="filter-group">
+            <span>Дата сборки: <span th:text="${machineModel.dateProduced}"></span></span>
+            <input type="hidden" th:field="*{dateProduced}"/>
+        </div>
+
+        <div class="filter-group">
+            <label for="dateCommissionedFromInput">Дата принятия в работу</label>
+            <input type="datetime-local" th:field="*{dateCommissioning}"
+                   id="dateCommissionedFromInput"/>
+            <div th:if="${#fields.hasErrors('dateCommissioning')}" style="color:red;">
+                <span th:errors="*{dateCommissioning}"></span>
+            </div>
+        </div>
+
+
+        <input type="hidden" th:field="*{model}"/>
+        <input type="hidden" th:field="*{id}"/>
+        <button class="filter-btn" type="submit">
+            Подтвердить
+        </button>
+        <button class="cancel-btn" type="reset" onclick="window.location.reload();">
+            Отменить
+        </button>
+    </form>
+</div>
+</body>
+</html>

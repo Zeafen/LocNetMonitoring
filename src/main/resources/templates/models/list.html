@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Модели</title>
+    <link rel="stylesheet" th:href="@{/css/list_styles.css}">
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>Модели устройств</h1>
+    </header>
+
+    <div class="main-content">
+        <form class="filters-section" action="/models" method="get">
+            <h2>Поиск моделей устройств</h2>
+
+            <div class="filter-group">
+                <label for="nameFilter">Имя модели усройства устройства</label>
+                <input type="text" name="name" th:value="${name}" id="nameFilter"
+                       placeholder="Введите наименование модели устройства...">
+            </div>
+
+            <div class="filter-group" th:if="${selectedType != null}">
+                <label for="selectedType">Выбранный тип</label>
+                <div id="selectedType" class="card">
+                    <div class="pagination">
+                        <a class="cancel-btn"
+                           th:href="@{/models(page=${models.number}, perPage=${models.size}, name=${name})}">
+                            Отменить
+                        </a>
+                    </div>
+                    <div th:replace="fragments/cards/machineType :: cardBody(${selectedType}">
+                    </div>
+                </div>
+                <input type="hidden" name="typeId" th:value="${selectedType.id}"/>
+            </div>
+            <div class="filter-group" th:unless="${selectedType != null}">
+                <label for="typeNameFilter">Имя типа устройства</label>
+                <input type="text" name="typeName" th:value="${typeName}" id="typeNameFilter"
+                       placeholder="Введите наименование типа устройства...">
+            </div>
+
+
+            <div class="filter-group">
+                <label for="pageSize">Количество элементов на странице</label>
+                <select id="pageSize" name="perPage">
+                    <option value="10" th:selected="${models.size == 10}">10</option>
+                    <option value="15" th:selected="${models.size == 15}">15</option>
+                    <option value="30" th:selected="${models.size == 30}">30</option>
+                </select>
+            </div>
+            <input type="hidden" value="0" name="page">
+
+            <div class="pagination">
+                <button class="filter-btn" type="submit">
+                    Применить фильтры
+                </button>
+                <a th:if="${selectedType != null and #authorization.expression('hasAuthority(''STUFF'')')}"
+                   th:href="@{/models(page=${models.number}, perPage=${models.size}, name=${name}, typeId=${typeId}, selectedModel=-1, typeName=${typeName})}"
+                   class="add-btn">Добавить модель
+                </a>
+            </div>
+        </form>
+
+        <section class="cards-section">
+            <div class="cards-container">
+                <!--                Show cards-->
+                <div class="card"
+                     th:each="model : ${models.content}"
+                     th:data-url="${#authorization.expression('hasAuthority(''OPERATOR'')')} ? @{models/{id}(id=${model.id})} : @{/machines(model=${model.id})}"
+                     onclick="window.location.href = this.getAttribute('data-url');">
+                    <div class="pagination">
+                        <a th:if="${#authorization.expression('hasAuthority(''STUFF'')')}"
+                           th:href="@{/models(page=${models.number}, perPage=${models.size}, name=${name}, typeId=${typeId},  selectedModel=${model.id})}">
+                            Изменить
+                        </a>
+                        <a th:if="${#authorization.expression('hasAuthority(''STUFF'')')}"
+                           th:href="@{/models/delete(id=${model.id})}">
+                            Удалить
+                        </a>
+                        <a th:href="@{/machines(model=${model.id})}">
+                            Устройства
+                        </a>
+                    </div>
+                    <div th:replace="fragments/cards/model :: cardBody(model)"></div>
+                </div>
+            </div>
+
+            <div class="pagination">
+                <a th:href="@{/models(page=0, perPage=${models.size}, name=${name}, typeId=${typeId}, typeName=${typeName})}">
+                    Первая
+                </a>
+                <a th:if="${models.totalPages > 0}"
+                   th:href="@{/models(page=${models.totalPages-1}, perPage=${models.size}, name=${name}, typeId=${typeId}, typeName=${typeName})}">
+                    Последняя
+                </a>
+
+                <div class="page-info">
+                    Страница <span th:text="${models.number + 1}">1</span> из <span
+                        th:text="${models.totalPages}">10</span>
+                </div>
+
+                <a th:if="${models.hasNext()}"
+                   th:href="@{/models(page=${models.number+1}, perPage=${models.size}, name=${name}, typeId=${typeId}, typeName=${typeName})}">
+                    Следующая
+                </a>
+                <a th:if="${models.hasPrevious()}"
+                   th:href="@{/models(page=${models.number-1}, perPage=${models.size}, name=${name}, typeId=${typeId}, typeName=${typeName})}">
+                    Предыдущая
+                </a>
+            </div>
+        </section>
+
+        <section th:if="${modelModel != null and #authorization.expression('hasAuthority(''STUFF'')')}">
+            <form action="#" th:object="${modelModel}" class="filters-section" th:action="@{/models/save}"
+                  method="post">
+                <div class="filter-group">
+                    <label for="modelNameInput">Наименование модели устройства</label>
+                    <input id="modelNameInput" th:field="*{name}" type="text"/>
+                    <div th:if="${#fields.hasErrors('name')}" style="color:red;">
+                        <span th:errors="*{name}"></span>
+                    </div>
+                </div>
+                <div class="filter-group">
+                    <label for="modelYearsExpireInput">Количество лет использования модели</label>
+                    <input id="modelYearsExpireInput" th:field="*{yearsExpire}" type="number" inputmode="numeric"
+                           step="1" min="1" max="100"/>
+                    <div th:if="${#fields.hasErrors('yearsExpire')}" style="color:red;">
+                        <span th:errors="*{yearsExpire}"></span>
+                    </div>
+                </div>
+                <input type="hidden" th:field="*{type}"/>
+                <input type="hidden" th:field="*{id}"/>
+                <button class="filter-btn" type="submit">
+                    Подтвердить
+                </button>
+                <button class="cancel-btn" type="reset" onclick="window.location.reload();">
+                    Отменить
+                </button>
+            </form>
+        </section>
+    </div>
+</div>
+</body>
+</html>

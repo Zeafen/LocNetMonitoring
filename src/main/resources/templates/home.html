@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Начальные сведения</title>
+    <link rel="stylesheet" th:href="@{/css/list_styles.css}"/>
+    <link rel="stylesheet" th:href="@{/css/header_style.css}"/>
+</head>
+
+<body>
+<div th:replace="~{fragments/header :: header}"></div>
+
+<div class="container">
+    <div class="tabs-container">
+        <div class="tabs">
+            <div class="tab" th:each="typeItem : ${bufferTypes}" th:data-url="@{/(page=${bufferType == typeItem.ordinal() ? buffer.number : 0},
+                 perPage=${buffer.size},
+                 machine=${selectedMachine?.id},
+                 maintenance=${selectedMaintenance?.id},
+                 dateFrom=${dateFrom},
+                 dateUntil=${dateUntil},
+                 isRead=${isRead},
+                 type=${typeItem.ordinal()})}" onclick="window.location.href = this.getAttribute('data-url');"
+                 th:with="countPart=${typeItem.parameterName} + 'Count'"
+                 th:classappend="${bufferType == typeItem.ordinal() ? 'active' : ''}">
+                <span th:text="${typeItem.displayName} + ' (' + ${__${countPart}__} + ')'"></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <form class="filters-section" th:action="@{/}" method="get">
+            <h1>Поиск уведомлений</h1>
+
+            <div class="filter-group" th:if="${selectedMachine != null}">
+                <label for="selectedMachineCard">Выбранное устройство</label>
+                <div id="selectedMachineCard" class="card">
+                    <div class="pagination">
+                        <a class="cancel-btn"
+                           th:href="@{/(page=0,
+                 perPage=${buffer.size},
+                 maintenance=${selectedMaintenance?.id},
+                 dateFrom=${dateFrom},
+                 dateUntil=${dateUntil},
+                 isRead=${isRead},
+                 type=${typeItem.ordinal()})}">Отменить
+                        </a>
+                    </div>
+                    <div class="card-id" th:text="${selectedMachine.id}">1</div>
+                    <div class="card-name" th:text="${selectedMachine.name}">Наименование</div>
+                    <div class="codes-list">
+                        <span class="code-item" th:text="'Адрес: ' + ${selectedMachine.address}">Адрес устройства</span>
+                        <span class="code-item"
+                              th:text="'Серийный номер: ' + ${selectedMachine.serialNumber}">Серийный номер</span>
+                        <span class="code-item"
+                              th:text="'Дата сборки: ' + ${selectedMachine.dateProduced}">Дата сборки</span>
+                        <span class="code-item"
+                              th:text="'Дата принятия: ' + ${selectedMachine.dateCommissioning}">Дата принятия</span>
+                        <span class="code-item"
+                              th:text="'Модель: ' + ${selectedMachine.model.name}">Модель устройства</span>
+                        <span class="code-item"
+                              th:text="'Тип устройства: ' + ${selectedMachine.model.type.name}">Тип устройства</span>
+                    </div>
+                </div>
+
+                <input type="hidden" name="machineId" th:value="${selectedMachine.id}"/>
+            </div>
+            <div class="card" th:if="${selectedMaintenance != null}">
+                <a class="cancel-btn"
+                   th:href="@{/(page=0,
+                 perPage=${buffer.size},
+                 machine=${selectedMachine?.id},
+                 dateFrom=${dateFrom},
+                 dateUntil=${dateUntil},
+                 isRead=${isRead},
+                 type=${typeItem.ordinal()})}">
+                    Отменить
+                </a>
+                <div class="card-id" th:text="${selectedMaintenance.id}">1</div>
+                <div class="card-name" th:text="${selectedMaintenance.type.name}"></div>
+                <div class="codes-list">
+                    <span class="code-item" th:text="'Период проведения: ' + ${selectedMaintenance.type.period}"></span>
+                    <span class="code-item"
+                          th:text="'Описание работ: ' + ${selectedMaintenance.workDescription}"></span>
+                </div>
+            </div>
+
+            <div class="filter-group">
+                <label for="pageSize">Количество элементов на странице</label>
+                <select id="pageSize" name="perPage">
+                    <option value="10" th:selected="${buffer.size == 10}">10</option>
+                    <option value="15" th:selected="${buffer.size == 15}">15</option>
+                    <option value="30" th:selected="${buffer.size == 30}">30</option>
+                </select>
+            </div>
+
+            <input type="hidden" value="0" name="page">
+            <input type="hidden" th:value="${bufferType}" name="type">
+            <div class="pagination">
+                <button class="filter-btn" type="submit">
+                    Применить фильтры
+                </button>
+            </div>
+        </form>
+
+        <div class="cards-section">
+            <div th:if="${buffer.content.isEmpty()}">
+                <h3>Объявлений не найдено</h3>
+                <p>Все объвления обработаны! Возникающие системные сообщения появяться здесь.</p>
+            </div>
+
+            <div th:unless="${buffer.content.isEmpty()}" class="cards-container">
+                <div class="card"
+                     th:with="warningLevel=${bufferTypes[buffer.bufferType].warningLevel}"
+                     th:each="bufferItem : ${buffer.content}"
+                     th:classappend="${[warningLevel]}">
+                    <div class="card-id" th:text="${bufferItem.isRead ? '' : '*Непрочитано'}"></div>
+                    <div class="card-id" th:text="${bufferItem.dateGenerated}"></div>
+                    <div class="card-name" th:text="${bufferTypes[buffer.bufferType].displayName}"></div>
+
+                    <span class="card-text"
+                          th:text="${bufferItem.machine.name} + ' ' + ${bufferItem.machine.serialNumber}"></span>
+                    <span class="card-text" th:if="${bufferItem.maintenance != null}"
+                          th:text="${bufferItem.maintenance.type.name} + ' ' + ${bufferItem.maintenance.id}"></span>
+
+                    <div class="codes-label">Получить больше информации:</div>
+                    <div class="codes-list">
+                        <a th:href="@{/machines/{id}(id=bufferItem.machine.id)}"
+                           class="code-item">Перейти к устройству</a>
+                        <a th:href="@{/maintenance/records(
+                        maintenance=${bufferItem.maintenance.id},
+                        machine=${bufferItem.machine.id})}"
+                           class="code-item" th:if="${bufferItem.maintenance != null}">Перейти к записям ТО</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<meta charset="UTF-8">
+<body>
+<th:block th:fragment="header">
+    <header class="main-header">
+        <div class="header-top">
+            <div class="logo-container">
+                <div class="logo-text">
+                    <h1>LocNetMonitoring</h1>
+                </div>
+            </div>
+            <div class="user-info">
+                <div class="user-name" th:text="${#authentication?.name ?: 'Guest'}"></div>
+                <form th:action="@{/logout}" method="post">
+                    <button type="submit" class="btn btn-sm btn-danger">Выйти</button>
+                </form>
+            </div>
+        </div>
+
+        <nav class="main-nav">
+            <ul class="nav-list">
+                <li class="nav-item">
+                    <a th:href="@{/}" class="nav-link">
+                        <span>Первичная информация</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a th:href="@{/types}" class="nav-link">
+                        <span>Типы устройств</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a th:href="@{/machines}" class="nav-link">
+                        <span>Устройства</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a th:href="@{/maintenance/types}" class="nav-link">
+                        <span>Типы ТО</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a th:href="@{/maintenance/records}" class="nav-link">
+                        <span>Записи ТО</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a th:href="@{/journal}" class="nav-link" th:if="${#authorization.expression('hasAuthority(''OPERATOR'')')}">
+                        <span>Журнал запросов</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </header>
+</th:block>
+</body>
+</html>

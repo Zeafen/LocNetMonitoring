@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Записи технические обслуживания (ТО)</title>
+    <link rel="stylesheet" th:href="@{/css/list_styles.css}">
+    <link rel="stylesheet" th:href="@{/css/header_style.css}"/>
+</head>
+
+<body>
+<div th:replace="~{fragments/header :: header}"></div>
+<div class="container">
+    <!--selected Machine and maintenance cards-->
+    <div class="cards-container">
+        <div class="card" th:if="${selectedMachine != null}">
+            <div class="pagination">
+                <a class="cancel-btn"
+                   th:href="@{/maintenance/records(
+                           page=0,
+                           perPage=${records.size},
+                           maintenance=${selectedMaintenance != null ? selectedMaintenance.id : null},
+                           status=${status},
+                           dateFrom=${dateFrom},
+                           dateUntil=${dateUntil})}">
+                    Отменить
+                </a>
+            </div>
+            <div th:replace="fragments/cards/machine :: cardBody(${selectedMachine})"></div>
+        </div>
+        <div class="card" th:if="${selectedMaintenance != null}">
+            <a class="cancel-btn"
+               th:href="@{/maintenance/records(
+                           page=0,
+                           perPage=${records.size},
+                           machine=${selectedMachine != null ? selectedMachine.id : null},
+                           status=${status},
+                           dateFrom=${dateFrom},
+                           dateUntil=${dateUntil})}">
+                Отменить
+            </a>
+            <div th:replace="~{fragments/cards/maintenance :: cardBody(${selectedMaintenance})}"></div>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <form class="filters-section" action="/maintenance/records" method="get">
+            <h2>Поиск записей ТО</h2>
+
+            <!--Filtering options-->
+            <div class="filter-group">
+                <label for="statusFilter">Статус</label>
+                <input type="text" name="status" th:value="${status}" id="statusFilter"
+                       placeholder="Введите искомый статус...">
+            </div>
+            <div class="filter-group">
+                <label for="dateFromFilter">Записи ТО с</label>
+                <input type="datetime-local" name="dateFrom" th:value="${dateFrom}"
+                       id="dateFromFilter"/>
+            </div>
+            <div class="filter-group">
+                <label for="dateUntilFilter">Записи ТО по</label>
+                <input type="datetime-local" name="dateUntil" th:value="${dateUntil}"
+                       id="dateUntilFilter"/>
+            </div>
+
+            <!--Pagination-->
+            <div class="filter-group">
+
+                <label for="pageSize">Количество элементов на странице</label>
+                <select id="pageSize" name="perPage">
+                    <option value="10" th:selected="${records.size == 10}">10</option>
+                    <option value="15" th:selected="${records.size == 15}">15</option>
+                    <option value="30" th:selected="${records.size == 30}">30</option>
+                </select>
+            </div>
+            <input type="hidden" value="0" name="page">
+            <input type="hidden" th:if="${selectedMachine != null}" th:value="${selectedMachine.id}" name="machine">
+            <input type="hidden" th:if="${selectedMaintenance != null}" th:value="${selectedMaintenance.id}"
+                   name="maintenance">
+
+            <div class="pagination">
+                <button class="filter-btn" type="submit">
+                    Применить фильтры
+                </button>
+                <a th:if="${selectedMaintenance != null and selectedMachine != null}"
+                   th:href="@{maintenance/records(
+                     page=${records.number},
+                     perPage=${records.size},
+                     machine=${selectedMachine != null ? selectedMachine.id : null},
+                     maintenance=${selectedMaintenance != null ? selectedMaintenance.id : null},
+                     record=null,
+                     status=${status},
+                     dateFrom=${dateFrom},
+                     dateUntil=${dateUntil})}"
+                   class="add-btn">Добавить запись ТО
+                </a>
+            </div>
+
+        </form>
+
+        <section class="cards-section">
+            <div class="cards-container">
+                <!--Show cards-->
+                <div class="card" th:each="recordItem : ${records.content}"
+                     th:data-url="@{maintenance/records(
+                     page=${records.number},
+                     perPage=${records.size},
+                     machine=${selectedMachine != null ? selectedMachine.id : null},
+                     maintenance=${selectedMaintenance != null ? selectedMaintenance.id : null},
+                     record=${recordItem.id},
+                     status=${status},
+                     dateFrom=${dateFrom},
+                     dateUntil=${dateUntil})}"
+                     onclick="window.location.href = this.getAttribute('data-url');">
+
+                    <div class="card-id" th:text="${recordItem.id}">1</div>
+                    <div class="card-name"
+                         th:text="'ТО: ' + ${recordItem.maintenance.type.name} + ${recordItem.maintenance.id}"></div>
+                    <div class="card-name"
+                         th:text="'Устройство: ' + ${recordItem.machine.name} + '(' + ${recordItem.machine.serialNumber} + ')'"></div>
+                    <div class="codes-list">
+                        <span class="code-item" th:text="'Дата начала: ' + ${recordItem.dateStarted}"></span>
+                        <span class="code-item"
+                              th:text="'Дата окончания: ' + ${recordItem.dateFinished == null ? 'Не установлено' : recordItem.dateFinished.toString()}"></span>
+                        <span class="code-item" th:text="'Причина: ' + ${recordItem.reason}"></span>
+                        <span class="code-item" th:text="'Статус: ' + ${recordItem.status}"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pagination">
+                <a th:href="@{maintenance/records(
+                     page=0,
+                     perPage=${records.size},
+                     machine=${selectedMachine != null ? selectedMachine.id : null},
+                     maintenance=${selectedMaintenance != null ? selectedMaintenance.id : null},
+                     record=${selectedRecord != null ? selectedRecord.id : null},
+                     status=${status},
+                     dateFrom=${dateFrom},
+                     dateUntil=${dateUntil})}">
+                    Первая
+                </a>
+                <a th:if="${records.totalPages > 0}" th:href="@{maintenance/records(
+                     page=${records.totalPages-1},
+                     perPage=${records.size},
+                     machine=${selectedMachine != null ? selectedMachine.id : null},
+                     maintenance=${selectedMaintenance != null ? selectedMaintenance.id : null},
+                     record=${selectedRecord != null ? selectedRecord.id : null},
+                     status=${status},
+                     dateFrom=${dateFrom},
+                     dateUntil=${dateUntil})}">
+                    Последняя
+                </a>
+
+                <div class="page-info">
+                    Страница <span th:text="${records.number + 1}">1</span> из <span
+                        th:text="${records.totalPages}">10</span>
+                </div>
+
+                <a th:if="${records.hasNext()}"
+                   th:href="$@{maintenance/records(
+                     page=${records.number+1},
+                     perPage=${records.size},
+                     machine=${selectedMachine != null ? selectedMachine.id : null},
+                     maintenance=${selectedMaintenance != null ? selectedMaintenance.id : null},
+                     record=${selectedRecord != null ? selectedRecord.id : null},
+                     status=${status},
+                     dateFrom=${dateFrom},
+                     dateUntil=${dateUntil})}">
+                    Следующая
+                </a>
+                <a th:if="${records.hasPrevious()}"
+                   th:href="@{maintenance/records(
+                     page=${records.number-1},
+                     perPage=${records.size},
+                     machine=${selectedMachine != null ? selectedMachine.id : null},
+                     maintenance=${selectedMaintenance != null ? selectedMaintenance.id : null},
+                     record=${selectedRecord != null ? selectedRecord.id : null},
+                     status=${status},
+                     dateFrom=${dateFrom},
+                     dateUntil=${dateUntil})}">
+                    Предыдущая
+                </a>
+            </div>
+        </section>
+
+        <section th:if="${selectedRecord != null}">
+            <form action="#" th:object="${selectedRecord}" class="filters-section"
+                  th:action="@{/maintenance/records/save}"
+                  method="post">
+                <div class="filter-group">
+                    <label for="dateStartedInput">Дата начала ТО</label>
+                    <input type="datetime-local" th:field="*{dateStarted}"
+                           id="dateStartedInput"/>
+                </div>
+                <div class="filter-group">
+                    <label for="dateFinishedInput">Дата окончания ТО</label>
+                    <input type="datetime-local" th:field="*{dateFinished}"
+                           id="dateFinishedInput"/>
+                </div>
+
+                <div class="filter-group">
+                    <label for="dateFinishedInput">Причина отправки на ТО</label>
+                    <input type="text" th:field="*{reason}" placeholder="Введите причину отправки на ТО"
+                           id="reasonInput"/>
+                </div>
+                <div class="filter-group">
+                    <label for="statusInput">Статус ТО</label>
+                    <select id="statusInput" th:field="*{status}">
+                        <option value="0">Обработка</option>
+                        <option value="1">Проверка</option>
+                        <option value="2">Проведение ТО</option>
+                        <option value="3">Завершено</option>
+                        <option value="4">Отклонено</option>
+                    </select>
+                </div>
+
+                <input type="hidden" th:field="*{id}"/>
+                <input type="hidden" th:field="*{machine}"/>
+                <input type="hidden" th:field="*{maintenance}"/>
+                <button class="filter-btn" type="submit">
+                    Подтвердить
+                </button>
+                <button class="cancel-btn" type="reset" onclick="window.location.reload();">
+                    Отменить
+                </button>
+            </form>
+        </section>
+    </div>
+</div>
+</body>
+</html>

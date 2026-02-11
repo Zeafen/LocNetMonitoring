@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Type info</title>
+    <link rel="stylesheet" th:href="@{/css/list_styles.css}">
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1 th:text="'Тип устройства ' + ${typeModel.id}">Тип устройства</h1>
+    </header>
+
+    <div class="main-content">
+        <!--Filtering section-->
+        <form class="filters-section" th:action="@{/types/{id}(id=${typeModel.id})}" method="get">
+            <h1 th:text="'Тип устройства ' + ${typeModel.id}">Тип устройства</h1>
+
+            <div class="filter-group">
+                <label for="nameFilter">Текст кода ответа</label>
+                <input type="text" name="rc_text" th:value="${rc_text}" id="nameFilter"
+                       placeholder="Введите текст кода ответа...">
+            </div>
+
+            <div class="filter-group">
+                <label for="codeNumberFilter">Номер кода ответа</label>
+                <input type="text" name="rc_codeNumber" th:value="${rc_codeNumber}" id="codeNumberFilter"
+                       placeholder="Введите текст кода ответа...">
+            </div>
+
+            <div class="filter-group">
+                <label for="isSucceedFilter">Успешен</label>
+                <select id="isSucceedFilter" name="rc_succeed">
+                    <option value="">Выберите из списка</option>
+                    <option value="false" th:selected="${rc_succeed == false}">Нет</option>
+                    <option value="true" th:selected="${rc_succeed == true}">Да</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+
+                <label for="pageSize">Количество элементов на странице</label>
+                <select id="pageSize" name="rc_perPage">
+                    <option value="10" th:selected="${requestCodes.size == 10}">10</option>
+                    <option value="15" th:selected="${requestCodes.size == 15}">15</option>
+                    <option value="30" th:selected="${requestCodes.size == 30}">30</option>
+                </select>
+            </div>
+            <input type="hidden" value="0" name="rc_page">
+
+            <button class="filter-btn" type="submit">
+                 Применить фильтры
+            </button>
+        </form>
+
+        <!--Cards section-->
+        <section class="cards-section">
+            <div class="cards-container">
+                <div class="card" th:each="requestCode : ${requestCodes.content}"
+                     th:data-url="@{/types/{id}(id=${typeModel.id}, rc_page=${requestCodes.number}, rc_perPage=${requestCodes.size}, rc_text=${rc_text}, rc_succeed=${rc_succeed}, rc_codeNumber=${rc_codeNumber}, rc_selected=${requestCode.codeNumber})}"
+                     onclick="window.location.href = this.getAttribute('data-url');">
+                    <a th:href="@{/types/codes/delete(id=${requestCode.id})}">
+                        Удалить
+                    </a>
+                    <div class="card-id" th:text="${requestCode.codeNumber}">123</div>
+                    <div class="card-name" th:text="${requestCode.succeed} ? 'Успешен' : 'Неуспешен'">Успешен</div>
+                    <span class="code-item" th:text="${requestCode.text}">Текст кода</span>
+                </div>
+            </div>
+
+            <!--Bottom pagination layer-->
+            <div class="pagination">
+                <a th:href="@{/types/{id}(id=${typeModel.id}, rc_page=0, rc_perPage=${requestCodes.size}, rc_text=${rc_text}, rc_succeed=${rc_succeed}, rc_codeNumber=${rc_codeNumber})}">
+                    Первая
+                </a>
+                <a th:href="@{/types/{id}(id=${typeModel.id}, rc_page=${requestCodes.totalPages-1}, rc_perPage=${requestCodes.size}, rc_text=${rc_text}, rc_succeed=${rc_succeed}, rc_codeNumber=${rc_codeNumber})}">
+                     Последняя
+                </a>
+
+                <div class="page-info">
+                    Страница <span th:text="${requestCodes.number + 1}">1</span> из <span
+                        th:text="${requestCodes.totalPages}">10</span>
+                </div>
+
+                <a th:if="${requestCodes.hasNext()}"
+                   th:href="@{/types/{id}(id=${typeModel.id}, rc_page=${requestCodes.number+1}, rc_perPage=${requestCodes.size}, rc_text=${rc_text}, rc_succeed=${rc_succeed}, rc_codeNumber=${rc_codeNumber})}">
+                    Следующая
+                </a>
+                <a th:if="${requestCodes.hasPrevious()}"
+                   th:href="@{/types/{id}(id=${typeModel.id}, rc_page=${requestCodes.number-1}, rc_perPage=${requestCodes.size}, rc_text=${rc_text}, rc_succeed=${rc_succeed}, rc_codeNumber=${rc_codeNumber})}">
+                    Предыдущая
+                </a>
+            </div>
+        </section>
+
+        <!--Code create/editing-->
+        <section th:if="${codeModel != null}">
+            <form action="#" th:object="${codeModel}" class="filters-section" th:action="@{/types/codes/save}"
+                  method="post">
+                <div class="filter-group">
+                    <label for="codeNumberInput">Код ответа</label>
+                    <input id="codeNumberInput" th:field="*{codeNumber}" type="number" min="1"/>
+                    <div th:if="${#fields.hasErrors('codeNumber')}" style="color:red;">
+                        <span th:errors="*{codeNumber}"></span>
+                    </div>
+                </div>
+
+                <div class="filter-group">
+                    <label for="isSucceedField">Успешен</label>
+                    <select id="isSucceedField" th:field="*{succeed}">
+                        <option value="false">Нет</option>
+                        <option value="true" selected>Да</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label for="textInput">Текст кода ответа</label>
+                    <input id="textInput" th:field="*{text}" type="text"/>
+                    <div th:if="${#fields.hasErrors('text')}" style="color:red;">
+                        <span th:errors="*{text}"></span>
+                    </div>
+                </div>
+
+                <input type="hidden" th:field="*{type}"/>
+                <input type="hidden" th:field="*{id}"/>
+                <button class="filter-btn" type="submit">
+                     Подтвердить
+                </button>
+                <button class="cancel-btn" type="reset" onclick="window.location.reload();">
+                     Отменить
+                </button>
+            </form>
+        </section>
+    </div>
+</div>
+</body>
+</html>

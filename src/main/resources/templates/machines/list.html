@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Machines</title>
+    <link rel="stylesheet" th:href="@{/css/list_styles.css}">
+    <link rel="stylesheet" th:href="@{/css/header_style.css}">
+</head>
+<body>
+<header th:replace="~{fragments/header :: header}"></header>
+<div class="container">
+
+    <div class="main-content">
+        <form class="filters-section" action="/machines" method="get">
+            <h2>Поиск устройств</h2>
+
+            <div class="filter-group">
+                <label for="nameFilter">Имя усройства</label>
+                <input type="text" name="name" th:value="${name}" id="nameFilter"
+                       placeholder="Введите наименование устройства...">
+            </div>
+
+            <div class="filter-group">
+                <label for="nameFilter">Адрес модели усройства</label>
+                <input type="text" name="address" th:value="${address}" id="addressFilter"
+                       placeholder="Введите адрес устройства...">
+            </div>
+
+            <div class="filter-group">
+                <label for="serialNumberFilter">Серийный номер усройства</label>
+                <input type="text" name="serialNumber" th:value="${serialNumber}" id="serialNumberFilter"
+                       placeholder="ВВедите Введите серийный номер устройства...">
+            </div>
+
+
+            <div class="filter-group">
+                <label for="dateCommissionedFromFilter">Период принятия в работу</label>
+                <input type="datetime-local" name="commissionedFrom" th:value="${commissionedFrom}"
+                       id="dateCommissionedFromFilter"
+                       placeholder="Выберите дату начала отсчёта периода принятия в работу..."/>
+            </div>
+            <div class="filter-group">
+                <label for="dateCommissionedUntilFilter">Период принятия в работу</label>
+                <input type="datetime-local" name="commissionedUntil" th:value="${commissionedUntil}"
+                       id="dateCommissionedUntilFilter"
+                       placeholder="Выберите дату окончания отсчёта периода принятия в работу..."/>
+            </div>
+
+            <div class="filter-group" th:if="${selectedType != null}">
+                <label for="selectedType">Выбранный тип</label>
+                <div id="selectedType" class="card">
+                    <div class="pagination">
+                        <a class="cancel-btn"
+                           th:href="@{/machines(
+                           page=${machines.number},
+                           perPage=${machines.size},
+                           name=${name},
+                           address=${address},
+                           model=${selectedModel == null ? null : selectedModel.id},
+                           serialNumber=${serialNumber},
+                           commissionedFrom=${commissionedFrom},
+                           commissionedUntil=${commissionedUntil}
+                           )}">
+                            Отменить
+                        </a>
+                    </div>
+                    <div th:replace="fragments/cards/machineType :: cardBody(${selectedType})"></div>
+                </div>
+            </div>
+            <div class="filter-group" th:if="${selectedType == null && selectedModel == null}">
+                <label for="typeNameFilter">Имя типа устройства</label>
+                <input type="text" name="typeName" th:value="${typeName}" id="typeNameFilter"
+                       placeholder="Введите наименование типа устройства...">
+            </div>
+
+            <div class="filter-group" th:if="${selectedModel != null}">
+                <label for="selectedModel">Выбранная модель</label>
+                <div id="selectedModel" class="card">
+                    <div class="pagination">
+                        <a class="cancel-btn"
+                           th:href="@{/machines(
+                           page=${machines.number},
+                           perPage=${machines.size},
+                           name=${name},
+                           address=${address},
+                           type=${selectedType == null ? null : selectedType.id},
+                           serialNumber=${serialNumber},
+                           commissionedFrom=${commissionedFrom},
+                           commissionedUntil=${commissionedUntil}
+                           )}">Отменить
+                        </a>
+                    </div>
+                    <div th:replace="fragments/cards/model :: cardBody(${selectedModel})"></div>
+                </div>
+            </div>
+            <div class="filter-group" th:if="${selectedType == null && selectedModel == null}">
+                <label for="modelNameFilter">Имя модели устройства</label>
+                <input type="text" name="modelName" th:value="${modelName}" id="modelNameFilter"
+                       placeholder="Введите наименование модели устройства...">
+            </div>
+
+
+            <div class="filter-group">
+
+                <label for="pageSize">Количество элементов на странице</label>
+                <select id="pageSize" name="perPage">
+                    <option value="10" th:selected="${machines.size == 10}">10</option>
+                    <option value="15" th:selected="${machines.size == 15}">15</option>
+                    <option value="30" th:selected="${machines.size == 30}">30</option>
+                </select>
+            </div>
+            <input type="hidden" value="0" name="page">
+            <input type="hidden" th:value="${selectedType == null ? null : selectedType.id}" name="type">
+            <input type="hidden" th:value="${selectedModel == null ? null : selectedModel.id}" name="model">
+
+            <div class="pagination">
+                <button class="filter-btn" type="submit">
+                    Применить фильтры
+                </button>
+                <a th:if="${selectedModel != null and #authorization.expression('hasAuthority(''STUFF'')')}"
+                   th:href="@{/machines(
+                           page=${machines.number},
+                           perPage=${machines.size},
+                           name=${name},
+                           address=${address},
+                           type=${selectedType == null ? null : selectedType.id},
+                           typeName=${typeName},
+                           model=${selectedModel == null ? null : selectedModel.id},
+                           modelName=${modelName},
+                           serialNumber=${serialNumber},
+                           commissionedFrom=${commissionedFrom},
+                           commissionedUntil=${commissionedUntil},
+                           selectedMachine=-1
+                           )}"
+                   class="add-btn">Добавить устройство
+                </a>
+            </div>
+        </form>
+
+        <section class="cards-section">
+            <div class="cards-container">
+                <!--Show cards-->
+                <div class="card" th:each="machine : ${machines.content}"
+                     th:data-url="@{machines/{id}(id=${machine.id})}"
+                     onclick="window.location.href = this.getAttribute('data-url');">
+                    <div class="pagination">
+                        <a th:href="@{/machines(
+                           page=${machines.number},
+                           perPage=${machines.size},
+                           name=${name},
+                           address=${address},
+                           type=${selectedType == null ? null : selectedType.id},
+                           typeName=${typeName},
+                           model=${selectedModel == null ? null : selectedModel.id},
+                           modelName=${modelName},
+                           serialNumber=${serialNumber},
+                           commissionedFrom=${commissionedFrom},
+                           commissionedUntil=${commissionedUntil},
+                           selectedMachine=${machine.id}
+                           )}">
+                            Изменить
+                        </a>
+                        <a th:href="@{/machines/delete/{id}(id=${machine.id})}">
+                            Удалить
+                        </a>
+                    </div>
+                    <div th:replace="fragments/cards/machine :: cardBody(${machine})"></div>
+                </div>
+            </div>
+
+            <div class="pagination">
+                <a th:href="@{/machines(
+                           page=0,
+                           perPage=${machines.size},
+                           name=${name},
+                           address=${address},
+                           type=${selectedType == null ? null : selectedType.id},
+                           typeName=${typeName},
+                           model=${selectedModel == null ? null : selectedModel.id},
+                           modelName=${modelName},
+                           serialNumber=${serialNumber},
+                           commissionedFrom=${commissionedFrom},
+                           commissionedUntil=${commissionedUntil}
+                           )}">
+                    Первая
+                </a>
+                <a th:if="${machines.totalPages > 0}" th:href="@{/machines(
+                           page=${machines.totalPages-1},
+                           perPage=${machines.size},
+                           name=${name},
+                           address=${address},
+                           type=${selectedType == null ? null : selectedType.id},
+                           typeName=${typeName},
+                           model=${selectedModel == null ? null : selectedModel.id},
+                           modelName=${modelName},
+                           serialNumber=${serialNumber},
+                           commissionedFrom=${commissionedFrom},
+                           commissionedUntil=${commissionedUntil}
+                           )}">
+                    Последняя
+                </a>
+
+                <div class="page-info">
+                    Страница <span th:text="${machines.number + 1}">1</span> из <span
+                        th:text="${machines.totalPages}">10</span>
+                </div>
+
+                <a th:if="${machines.hasNext()}"
+                   th:href="@{/machines(
+                           page=${machines.number+1},
+                           perPage=${machines.size},
+                           name=${name},
+                           address=${address},
+                           type=${selectedType == null ? null : selectedType.id},
+                           typeName=${typeName},
+                           model=${selectedModel == null ? null : selectedModel.id},
+                           modelName=${modelName},
+                           serialNumber=${serialNumber},
+                           commissionedFrom=${commissionedFrom},
+                           commissionedUntil=${commissionedUntil}
+                           )}">
+                    Следующая
+                </a>
+                <a th:if="${machines.hasPrevious()}"
+                   th:href="@{/machines(
+                           page=${machines.number},
+                           perPage=${machines.size},
+                           name=${name},
+                           address=${address},
+                           type=${selectedType == null ? null : selectedType.id},
+                           typeName=${typeName},
+                           model=${selectedModel == null ? null : selectedModel.id},
+                           modelName=${modelName},
+                           serialNumber=${serialNumber},
+                           commissionedFrom=${commissionedFrom},
+                           commissionedUntil=${commissionedUntil}
+                           )}">
+                    Предыдущая
+                </a>
+            </div>
+        </section>
+
+        <section th:if="${machineModel != null}">
+            <div th:if="${#authorization.expression('hasAuthority(''STUFF'')')}"
+                 th:replace="fragments/forms/machine_stuff :: form(${machineModel})"></div>
+            <div th:if="${#authorization.expression('hasAuthority(''OPERATOR'')')}"
+                 th:replace="fragments/forms/machine_operator :: form(${machineModel})"></div>
+        </section>
+    </div>
+</div>
+</body>
+</html>

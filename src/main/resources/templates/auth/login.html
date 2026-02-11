@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org">
+<head>
+    <title>AUTH</title>
+    <script>
+        window.onload = function() {
+            var errorMessage = document.getElementById('errorMessage');
+            if (errorMessage && errorMessage.textContent.trim() !== '') {
+                alert(errorMessage.textContent);
+            }
+        };
+    </script>
+    <link rel="stylesheet" th:href="@{/css/auth.css}"/>
+    <link rel="stylesheet" th:href="@{/css/header_style.css}"/>
+</head>
+<header class="main-header">
+    <div class="header-top">
+        <div class="logo-container">
+            <div class="logo-text">
+                <h1>LocNetMonitoring</h1>
+            </div>
+        </div>
+    </div>
+</header>
+<body>
+<div class="auth-container">
+    <h3 id="errorMessage" th:text="${error_message}" style="display:none;"></h3>
+    <div th:if="${param.error}">
+        Неверное имя пользователя или пароль.
+    </div>
+    <form th:action="@{/login}" method="post">
+        <div class="form-group">
+            <label for="usernameInput">Имя роли</label>
+            <input type="text"
+                   name="username"
+                   id="usernameInput"
+                   class="form-control"
+                   placeholder="Введите логин роли"
+                   required/>
+        </div>
+        <div class="form-group">
+            <label for="passwordInput">Имя роли</label>
+            <input type="password"
+                   name="password"
+                   id="passwordInput"
+                   class="form-control"
+                   placeholder="Введите пароль"
+                   required/>
+        </div>
+        <div><input class="auth-btn" type="submit" value="Авторизация"/></div>
+    </form>
+</div>
+</body>
+</html>
