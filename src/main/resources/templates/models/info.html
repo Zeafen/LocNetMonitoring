@@ -52,7 +52,7 @@
                 <div class="card" th:each="standard : ${standards.content}"
                      th:data-url="@{/models/{id}(id=${modelModel.id}, st_page=${standards.number}, st_perPage=${standards.size}, st_parameterName=${st_parameterName}, st_selected=${standard.id})}"
                      onclick="window.location.href = this.getAttribute('data-url');">
-                    <a th:href="@{/models/standards/delete(id=${standard.id})}">
+                    <a th:href="@{/models/standards/delete/{id}(id=${standard.id})}">
                         Удалить
                     </a>
                     <div class="card-id" th:text="${standard.id}">13</div>

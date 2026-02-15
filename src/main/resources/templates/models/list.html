@@ -81,7 +81,7 @@
                             Изменить
                         </a>
                         <a th:if="${#authorization.expression('hasAuthority(''STUFF'')')}"
-                           th:href="@{/models/delete(id=${model.id})}">
+                           th:href="@{/models/delete/{id}(id=${model.id})}">
                             Удалить
                         </a>
                         <a th:href="@{/machines(model=${model.id})}">

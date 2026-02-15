@@ -53,7 +53,7 @@ public class MachineTypesController {
         return "machineTypes/list";
     }
 
-    @PreAuthorize("hasAuthority('STUFF')")
+    @PreAuthorize("hasAuthority('OPERATOR')")
     @GetMapping("/{id}")
     public String getMachineTypeInfo(
             @PathVariable(name = "id") Short id,
@@ -126,13 +126,13 @@ public class MachineTypesController {
         if (machine == null)
             throw new EntityNotFoundException("Machine with id " + id.toString() + " was not found");
         machineTypes.deleteMachineType(id);
-        return "redirect:/machines";
+        return "redirect:/types";
     }
 
 
     ///  Request codes segment ///
     //adding codes segment
-    @PreAuthorize("hasAuthority('STUFF')")
+    @PreAuthorize("hasAuthority('OPERATOR')")
     @PostMapping("/codes/save")
     public String addCodeToMachineType(
             @Valid @ModelAttribute RequestCode code,
@@ -149,16 +149,17 @@ public class MachineTypesController {
     }
 
     //Deleting request code segment
-    @PreAuthorize("hasAuthority('STUFF')")
+    @PreAuthorize("hasAuthority('OPERATOR')")
     @GetMapping("/codes/delete/{id}")
     public String deleteRequestCode(
             @PathVariable Short id
     ) {
-        RequestCode machine = requestCodesService.getRequestCodeByID(id);
-
-        if (machine == null)
+        RequestCode requestCode = requestCodesService.getRequestCodeByID(id);
+        if (requestCode == null)
             throw new EntityNotFoundException("Machine with id " + id.toString() + " was not found");
+
+        var typeId = requestCode.getType().getId();
         requestCodesService.deleteRequestCode(id);
-        return "redirect:/machines";
+        return "redirect:/types/" + typeId;
     }
 }

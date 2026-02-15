@@ -58,7 +58,7 @@
                 <div class="card" th:each="requestCode : ${requestCodes.content}"
                      th:data-url="@{/types/{id}(id=${typeModel.id}, rc_page=${requestCodes.number}, rc_perPage=${requestCodes.size}, rc_text=${rc_text}, rc_succeed=${rc_succeed}, rc_codeNumber=${rc_codeNumber}, rc_selected=${requestCode.codeNumber})}"
                      onclick="window.location.href = this.getAttribute('data-url');">
-                    <a th:href="@{/types/codes/delete(id=${requestCode.codeNumber})}">
+                    <a th:href="@{/types/codes/delete/{id}(id=${requestCode.codeNumber})}">
                         Удалить
                     </a>
                     <div class="card-id" th:text="${requestCode.codeNumber}">123</div>

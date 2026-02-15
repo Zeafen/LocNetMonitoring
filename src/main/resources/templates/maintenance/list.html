@@ -87,7 +87,7 @@
             <div class="cards-container">
                 <!--Show cards-->
                 <div class="card" th:each="maintenanceRec : ${maintenance.content}"
-                     th:data-url="@{maintenance/records(machine=${machineId}, maintenance=${maintenanceRec.id})}"
+                     th:data-url="@{/maintenance/records(machine=${machineId}, maintenance=${maintenanceRec.id})}"
                      onclick="window.location.href = this.getAttribute('data-url');">
                     <div class="pagination">
                         <a th:if="${#authorization.expression('hasAuthority(''STUFF'')')}"

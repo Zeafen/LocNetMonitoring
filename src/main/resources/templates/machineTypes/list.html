@@ -52,10 +52,10 @@
                         <a th:if="${#authorization.expression('hasAuthority(''STUFF'')')}"
                            th:href="@{/types(page=${types.number}, perPage=${types.size}, name=${name}, selectedType=${type.id})}">Изменить</a>
                         <a th:if="${#authorization.expression('hasAuthority(''STUFF'')')}"
-                           th:href="@{/types/delete(id=${type.id})}">Удалить</a>
+                           th:href="@{/types/delete/{id}(id=${type.id})}">Удалить</a>
                         <a th:href="@{/models(typeId=${type.id})}">Модели</a>
                     </div>
-                    <div th:data-url="${#authorization.expression('hasAuthority(''STUFF'')')} ? @{types/{id}(id=${type.id})} : @{/models(typeId=${type.id})}"
+                    <div th:data-url="${#authorization.expression('hasAuthority(''OPERATOR'')')} ? @{types/{id}(id=${type.id})} : @{/models(typeId=${type.id})}"
                          onclick="window.location.href = this.getAttribute('data-url');">
                         <div th:replace="fragments/cards/machineType :: cardBody(${type})">
                         </div>
