@@ -96,8 +96,8 @@ public class MaintenanceRecordUiModel {
         var maintenanceRecord = new MaintenanceRecords();
         maintenanceRecord.setMaintenance(this.maintenance);
         maintenanceRecord.setId(this.id);
-        maintenanceRecord.setDateFinished(this.dateFinished.atOffset(ZoneOffset.UTC));
-        maintenanceRecord.setDateStarted(this.dateStarted.atOffset(ZoneOffset.UTC));
+        maintenanceRecord.setDateFinished(this.dateFinished == null ? null : this.dateFinished.atOffset(ZoneOffset.UTC));
+        maintenanceRecord.setDateStarted(this.dateStarted == null ? null : this.dateStarted.atOffset(ZoneOffset.UTC));
         maintenanceRecord.setMachine(this.machine);
         maintenanceRecord.setReason(this.reason);
         maintenanceRecord.setStatus(this.status);

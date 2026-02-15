@@ -21,7 +21,7 @@
                        placeholder="Введите наименование модели устройства...">
             </div>
 
-            <div class="filter-group" th:if="${selectedType != null}">
+            <div class="filter-group" th:if="${selectedType != null and selectedType.id != null}">
                 <label for="selectedType">Выбранный тип</label>
                 <div id="selectedType" class="card">
                     <div class="pagination">
@@ -30,10 +30,15 @@
                             Отменить
                         </a>
                     </div>
-                    <div th:replace="fragments/cards/machineType :: cardBody(${selectedType}">
+                    <div class="card-id" th:text="${selectedType?.id}">1</div>
+                    <div class="card-name" th:text="${selectedType.name}"></div>
+                    <div class="codes-list"
+                         th:each="code : ${selectedType?.typeRequestCodes?.stream()?.limit(5)?.toList()}">
+        <span class="code-item"
+              th:text="${code.codeNumber} + (${code.succeed} ? ' - успешен' : ' - неуспешен')"></span>
                     </div>
                 </div>
-                <input type="hidden" name="typeId" th:value="${selectedType.id}"/>
+                <input type="hidden" name="typeId" th:value="${selectedType?.id}"/>
             </div>
             <div class="filter-group" th:unless="${selectedType != null}">
                 <label for="typeNameFilter">Имя типа устройства</label>
@@ -57,7 +62,7 @@
                     Применить фильтры
                 </button>
                 <a th:if="${selectedType != null and #authorization.expression('hasAuthority(''STUFF'')')}"
-                   th:href="@{/models(page=${models.number}, perPage=${models.size}, name=${name}, typeId=${typeId}, selectedModel=-1, typeName=${typeName})}"
+                   th:href="@{/models(page=${models.number}, perPage=${models.size}, name=${name}, typeId=${selectedType?.id}, selectedModel=-1, typeName=${typeName})}"
                    class="add-btn">Добавить модель
                 </a>
             </div>
@@ -68,11 +73,11 @@
                 <!--                Show cards-->
                 <div class="card"
                      th:each="model : ${models.content}"
-                     th:data-url="${#authorization.expression('hasAuthority(''OPERATOR'')')} ? @{models/{id}(id=${model.id})} : @{/machines(model=${model.id})}"
+                     th:data-url="${#authorization.expression('hasAuthority(''OPERATOR'')')} ? @{/models/{id}(id=${model.id})} : @{/machines(model=${model.id})}"
                      onclick="window.location.href = this.getAttribute('data-url');">
                     <div class="pagination">
                         <a th:if="${#authorization.expression('hasAuthority(''STUFF'')')}"
-                           th:href="@{/models(page=${models.number}, perPage=${models.size}, name=${name}, typeId=${typeId},  selectedModel=${model.id})}">
+                           th:href="@{/models(page=${models.number}, perPage=${models.size}, name=${name}, typeId=${selectedType?.id},  selectedModel=${model.id})}">
                             Изменить
                         </a>
                         <a th:if="${#authorization.expression('hasAuthority(''STUFF'')')}"
@@ -83,16 +88,23 @@
                             Устройства
                         </a>
                     </div>
-                    <div th:replace="fragments/cards/model :: cardBody(model)"></div>
+                    <div class="card-id" th:text="${model.id}"></div>
+                    <div class="card-name" th:text="${model.name}"></div>
+                    <div class="codes-list">
+                        <span class="code-item"
+                              th:text="'Тип устройства: ' + ${model.type.name}"></span>
+                        <span class="code-item"
+                              th:text="'Количество лет использования: ' + ${model.yearsExpire}"></span>
+                    </div>
                 </div>
             </div>
 
             <div class="pagination">
-                <a th:href="@{/models(page=0, perPage=${models.size}, name=${name}, typeId=${typeId}, typeName=${typeName})}">
+                <a th:href="@{/models(page=0, perPage=${models.size}, name=${name}, typeId=${selectedType?.id}, typeName=${typeName})}">
                     Первая
                 </a>
                 <a th:if="${models.totalPages > 0}"
-                   th:href="@{/models(page=${models.totalPages-1}, perPage=${models.size}, name=${name}, typeId=${typeId}, typeName=${typeName})}">
+                   th:href="@{/models(page=${models.totalPages-1}, perPage=${models.size}, name=${name}, typeId=${selectedType?.id}, typeName=${typeName})}">
                     Последняя
                 </a>
 
@@ -102,11 +114,11 @@
                 </div>
 
                 <a th:if="${models.hasNext()}"
-                   th:href="@{/models(page=${models.number+1}, perPage=${models.size}, name=${name}, typeId=${typeId}, typeName=${typeName})}">
+                   th:href="@{/models(page=${models.number+1}, perPage=${models.size}, name=${name}, typeId=${selectedType?.id}, typeName=${typeName})}">
                     Следующая
                 </a>
                 <a th:if="${models.hasPrevious()}"
-                   th:href="@{/models(page=${models.number-1}, perPage=${models.size}, name=${name}, typeId=${typeId}, typeName=${typeName})}">
+                   th:href="@{/models(page=${models.number-1}, perPage=${models.size}, name=${name}, typeId=${selectedType?.id}, typeName=${typeName})}">
                     Предыдущая
                 </a>
             </div>

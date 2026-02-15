@@ -23,10 +23,9 @@ import java.util.Map;
 @RequestMapping("/models")
 public class MachineModelsController {
     @Autowired
-    private MachineModelsService _modelsService;
-
+    private MachineTypesService machineTypes;
     @Autowired
-    private MachineTypesService _typesService;
+    private MachineModelsService modelsService;
 
 
     ///Getting models segment ///
@@ -41,15 +40,18 @@ public class MachineModelsController {
             Model model
     ) {
         Page<MachineModel> models = typeId == null && (typeName != null && !typeName.isBlank())
-                ? _modelsService.getMachineModelsByTypeName(page, perPage, typeName, name)
-                : _modelsService.getMachineModels(page, perPage, typeId, name);
-        MachineType selectedType = typeId == null
-                ? null : _typesService.getMachineTypeByID(typeId);
+                ? modelsService.getMachineModelsByTypeName(page, perPage, typeName, name)
+                : modelsService.getMachineModels(page, perPage, typeId, name);
+        MachineType selectedType = null;
+        var selectedTypes = machineTypes.getMachineTypes(0, 10, null);
+
+        if (typeId != null)
+            selectedType = machineTypes.getMachineTypeByID(typeId);
 
         if (selectedModelId != null) {
             MachineModel selectedModel = null;
             if (selectedModelId > 0)
-                selectedModel = _modelsService.getModelById(selectedModelId);
+                selectedModel = modelsService.getModelById(selectedModelId);
             if (selectedModel == null && selectedType != null) {
                 selectedModel = new MachineModel();
                 selectedModel.setType(selectedType);
@@ -75,16 +77,16 @@ public class MachineModelsController {
             @RequestParam(name = "st_selected", required = false) Integer selectedStandard,
             Model model
     ) {
-        MachineModel machineModel = _modelsService.getModelById(modelId);
+        MachineModel machineModel = modelsService.getModelById(modelId);
         if (machineModel == null)
             throw new EntityNotFoundException("Model with id" + modelId + " was not found!");
-        Page<ModelStandard> standards = _modelsService.getModelStandards(standardsPage, standardsPerPage, modelId, standardsParameterName);
+        Page<ModelStandard> standards = modelsService.getModelStandards(standardsPage, standardsPerPage, modelId, standardsParameterName);
 
         Map<String, Object> attributes = new HashMap<>();
         if (selectedStandard != null) {
             ModelStandard standard = null;
             if (selectedStandard > 0)
-                standard = _modelsService.getModelStandardById(selectedStandard);
+                standard = modelsService.getModelStandardById(selectedStandard);
             if (standard == null) {
                 standard = new ModelStandard();
                 standard.setModel(machineModel);
@@ -113,7 +115,7 @@ public class MachineModelsController {
             return "redirect:/error";
         }
 
-        _modelsService.saveModelStandard(standard);
+        modelsService.saveModelStandard(standard);
         return "redirect:/models/" + standard.getModel().getId();
     }
 
@@ -124,11 +126,11 @@ public class MachineModelsController {
     public String deleteModelStandard(
             @PathVariable(name = "id") Integer standardId
     ) {
-        ModelStandard standard = _modelsService.getModelStandardById(standardId);
+        ModelStandard standard = modelsService.getModelStandardById(standardId);
         if (standard == null)
             throw new EntityNotFoundException("Standard with id " + standardId + " was not found");
 
-        _modelsService.deleteModelStandard(standardId);
+        modelsService.deleteModelStandard(standardId);
         return "redirect:/models/" + standard.getModel().getId();
     }
 
@@ -146,7 +148,7 @@ public class MachineModelsController {
             return "redirect:/error";
         }
 
-        _modelsService.saveMachineModel(model);
+        modelsService.saveMachineModel(model);
         return "redirect:/models";
     }
 
@@ -157,11 +159,11 @@ public class MachineModelsController {
     public String deleteModel(
             @PathVariable Short id
     ) {
-        MachineModel model = _modelsService.getModelById(id);
+        MachineModel model = modelsService.getModelById(id);
 
         if (model == null)
             throw new EntityNotFoundException("Model with id " + id.toString() + " was not found");
-        _modelsService.deleteMachineModel(id);
+        modelsService.deleteMachineModel(id);
         return "redirect:/models";
     }
 }

@@ -12,7 +12,6 @@
     </header>
 
     <div class="main-content">
-        <!--Filtering section-->
         <form class="filters-section" th:action="@{/types/{id}(id=${typeModel.id})}" method="get">
             <h1 th:text="'Тип устройства ' + ${typeModel.id}">Тип устройства</h1>
 
@@ -59,7 +58,7 @@
                 <div class="card" th:each="requestCode : ${requestCodes.content}"
                      th:data-url="@{/types/{id}(id=${typeModel.id}, rc_page=${requestCodes.number}, rc_perPage=${requestCodes.size}, rc_text=${rc_text}, rc_succeed=${rc_succeed}, rc_codeNumber=${rc_codeNumber}, rc_selected=${requestCode.codeNumber})}"
                      onclick="window.location.href = this.getAttribute('data-url');">
-                    <a th:href="@{/types/codes/delete(id=${requestCode.id})}">
+                    <a th:href="@{/types/codes/delete(id=${requestCode.codeNumber})}">
                         Удалить
                     </a>
                     <div class="card-id" th:text="${requestCode.codeNumber}">123</div>
@@ -122,7 +121,6 @@
                 </div>
 
                 <input type="hidden" th:field="*{type}"/>
-                <input type="hidden" th:field="*{id}"/>
                 <button class="filter-btn" type="submit">
                      Подтвердить
                 </button>

@@ -8,7 +8,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface MachineTypesRepository extends JpaRepository<MachineType, Short> {
-
     @Query(
             value = "SELECT * FROM machine_types AS mt WHERE " +
                     "(:name IS NULL OR mt.name LIKE %:name%)",
@@ -19,5 +18,13 @@ public interface MachineTypesRepository extends JpaRepository<MachineType, Short
     Page<MachineType> findAllByName(
             @Param("name") String name,
             Pageable pageable
+    );
+
+    @Query(value = "SELECT * FROM machine_types AS mt WHERE " +
+            "(:id IS NULL OR mt.id = %:id%)",
+            nativeQuery = true
+    )
+    MachineType getMachineById(
+            @Param("id") Short id
     );
 }

@@ -63,6 +63,7 @@
                         <span class="code-item"
                               th:text="'Значение предупрждения: ' + ${standard.suggestionValue}">12</span>
                         <span class="code-item" th:text="'Критическое значение: ' + ${standard.warningValue}">123</span>
+                        <span class="code-item" th:text="'{Характеристика должна быть: ' + ${standard.greater ? '>' : '<'}">123</span>
                         <span class="code-item" th:text="'Наименование модели:' + ${standard.model.name}">Модель устройства</span>
                     </div>
                 </div>
@@ -121,6 +122,17 @@
                     <input id="warningValueInput" th:field="*{warningValue}" type="number" min="0" step="0.001"/>
                     <div th:if="${#fields.hasErrors('warningValue')}" style="color:red;">
                         <span th:errors="*{warningValue}"></span>
+                    </div>
+                </div>
+
+                <div class="filter-group">
+                    <label for="greaterValueInput">Направление сравнения</label>
+                    <select id="greaterValueInput" th:field="*{greater}" required>
+                        <option value="true">Значение характеристики должно превышать</option>
+                        <option value="false">Значение характеристики должно быть меньше</option>
+                    </select>
+                    <div th:if="${#fields.hasErrors('greater')}" style="color:red;">
+                        <span th:errors="*{greater}"></span>
                     </div>
                 </div>
 

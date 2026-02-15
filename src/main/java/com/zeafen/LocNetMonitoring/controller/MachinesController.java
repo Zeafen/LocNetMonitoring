@@ -12,9 +12,9 @@ import com.zeafen.LocNetMonitoring.domain.services.MachinesService;
 import com.zeafen.LocNetMonitoring.domain.services.MaintenanceService;
 import com.zeafen.LocNetMonitoring.domain.stub.UserRole;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.PermissionDeniedDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -32,13 +32,13 @@ import java.util.Objects;
 @RequestMapping("/machines")
 public class MachinesController {
     @Autowired
-    private MachinesService _machinesService;
+    private MachinesService machinesService;
     @Autowired
-    private MachineTypesService _machineTypesService;
+    private MachineTypesService machineTypesService;
     @Autowired
-    private MachineModelsService _modelsService;
+    private MachineModelsService modelsService;
     @Autowired
-    private MaintenanceService _maintenanceService;
+    private MaintenanceService maintenanceService;
 
 
     @GetMapping
@@ -63,26 +63,26 @@ public class MachinesController {
 
         Page<Machine> machines;
         if (modelId != null) {
-            machines = _machinesService.getMachinesByModel(page, perPage,
+            machines = machinesService.getMachinesByModel(page, perPage,
                     modelId,
                     name,
                     address,
                     dateCommissionedFrom == null ? null : dateCommissionedFrom.atOffset(ZoneOffset.UTC),
                     dateCommissionedUntil == null ? null : dateCommissionedUntil.atOffset(ZoneOffset.UTC),
                     serialNumber);
-            model.addAttribute("selectedModel", _modelsService.getModelById(modelId));
+            model.addAttribute("selectedModel", modelsService.getModelById(modelId));
         } else if (typeId != null) {
-            machines = _machinesService.getMachinesByType(page, perPage,
+            machines = machinesService.getMachinesByType(page, perPage,
                     typeId,
                     name,
                     address,
                     dateCommissionedFrom == null ? null : dateCommissionedFrom.atOffset(ZoneOffset.UTC),
                     dateCommissionedUntil == null ? null : dateCommissionedUntil.atOffset(ZoneOffset.UTC),
                     serialNumber);
-            model.addAttribute("selectedType", _machineTypesService.getMachineTypeByID(typeId));
+            model.addAttribute("selectedType", machineTypesService.getMachineTypeByID(typeId));
         } else {
             machines = modelName != null && !modelName.isBlank()
-                    ? _machinesService.getMachinesByModel(page, perPage,
+                    ? machinesService.getMachinesByModel(page, perPage,
                     modelName,
                     name,
                     address,
@@ -90,14 +90,14 @@ public class MachinesController {
                     dateCommissionedUntil == null ? null : dateCommissionedUntil.atOffset(ZoneOffset.UTC),
                     serialNumber)
                     : (typeName != null && !typeName.isBlank()
-                    ? _machinesService.getMachinesByType(page, perPage,
+                    ? machinesService.getMachinesByType(page, perPage,
                     typeName,
                     name,
                     address,
                     dateCommissionedFrom == null ? null : dateCommissionedFrom.atOffset(ZoneOffset.UTC),
                     dateCommissionedUntil == null ? null : dateCommissionedUntil.atOffset(ZoneOffset.UTC),
                     serialNumber)
-                    : _machinesService.getMachines(page, perPage,
+                    : machinesService.getMachines(page, perPage,
                     name,
                     address,
                     dateCommissionedFrom == null ? null : dateCommissionedFrom.atOffset(ZoneOffset.UTC),
@@ -105,14 +105,16 @@ public class MachinesController {
                     serialNumber));
         }
 
-        if (selectedMachineId != null && modelId != null) {
+        if (selectedMachineId != null) {
             Machine selectedMachine = null;
             if (selectedMachineId > 0)
-                selectedMachine = _machinesService.getMachineByID(selectedMachineId);
+                selectedMachine = machinesService.getMachineByID(selectedMachineId);
             if (selectedMachine == null && auth != null &&
-                    auth.getAuthorities().stream().anyMatch(ath -> Objects.equals(ath, UserRole.STUFF))) {
+                    auth.getAuthorities().stream().anyMatch(ath -> Objects.equals(ath, UserRole.STUFF)) &&
+                    modelId != null) {
                 selectedMachine = new Machine();
                 selectedMachine.setModel((MachineModel) model.getAttribute("selectedModel"));
+                selectedMachine.setAddress("000.000.000.000");
             }
             model.addAttribute("machineModel", selectedMachine != null ? selectedMachine.totUiModel() : null);
         }
@@ -144,15 +146,15 @@ public class MachinesController {
     ) {
         var auth = SecurityContextHolder.getContext().getAuthentication();
 
-        Machine machineInfo = _machinesService.getMachineByID(id);
+        Machine machineInfo = machinesService.getMachineByID(id);
         if (machineInfo == null)
             throw new EntityNotFoundException("Machine with id " + id + " was not found");
 
         if (auth != null && auth.getAuthorities().stream()
                 .anyMatch(authority ->
                         Objects.equals(authority.getAuthority(), UserRole.OPERATOR.getAuthority()))) {
-            List<ModelStandard> standards = _modelsService.getModelStandards(1, Integer.MAX_VALUE, machineInfo.getModel().getId(), null).get().toList();
-            var machineStats = _machinesService.getMachineStats(statsPage, statsPerPage,
+            List<ModelStandard> standards = modelsService.getModelStandards(0, Integer.MAX_VALUE, machineInfo.getModel().getId(), null).getContent().stream().toList();
+            var machineStats = machinesService.getMachineStats(statsPage, statsPerPage,
                     id,
                     statsFrom == null ? null : statsFrom.atTime(OffsetTime.of(LocalTime.MIN, ZoneOffset.UTC)),
                     statsUntil == null ? null : statsUntil.atTime(OffsetTime.of(LocalTime.MAX, ZoneOffset.UTC))
@@ -162,12 +164,24 @@ public class MachinesController {
             model.addAttribute("s_untilDay", statsUntil);
         }
 
-        Page<MachineMaintenanceSummary> summary = _maintenanceService.getMaintenanceSummary(maintenancePage, maintenancePerPage, id, null, null, null);
+        Page<MachineMaintenanceSummary> summary = maintenanceService.getMaintenanceSummary(maintenancePage, maintenancePerPage, id, null, null, null);
 
         model.addAttribute("machineModel", machineInfo);
         model.addAttribute("maintenanceSummary", summary);
 
         return "machines/info";
+    }
+
+    @GetMapping("/stats/refresh")
+    public String refreshMachinesStats(
+            HttpServletRequest request
+    ) {
+        machinesService.refreshStats();
+
+        String referer = request.getHeader("Referer");
+        if (referer != null && !referer.isEmpty())
+            return "redirect:" + referer;
+        else return "redirect:/machines";
     }
 
 
@@ -188,7 +202,7 @@ public class MachinesController {
             return "redirect:/error";
         }
 
-        _machinesService.saveMachine(machine.toMachine());
+        machinesService.saveMachine(machine.toMachine());
         return "redirect:/machines";
     }
 
@@ -197,11 +211,11 @@ public class MachinesController {
     public String deleteMachine(
             @PathVariable Integer id
     ) {
-        Machine machine = _machinesService.getMachineByID(id);
+        Machine machine = machinesService.getMachineByID(id);
 
         if (machine == null)
             throw new EntityNotFoundException("Machine with id " + id.toString() + " was not found");
-        _machinesService.deleteMachine(id);
+        machinesService.deleteMachine(id);
         return "redirect:/machines";
     }
 }

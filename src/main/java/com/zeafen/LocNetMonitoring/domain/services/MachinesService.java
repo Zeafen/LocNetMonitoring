@@ -9,6 +9,8 @@ import org.springframework.data.domain.Page;
 import java.time.OffsetDateTime;
 
 public interface MachinesService {
+
+    void refreshStats();
     Page<Machine> getMachines(
             int page,
             int perPage,

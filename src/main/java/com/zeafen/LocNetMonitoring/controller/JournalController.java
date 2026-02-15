@@ -19,11 +19,27 @@ import java.time.ZoneOffset;
 @RequestMapping("/journal")
 public class JournalController {
     @Autowired
-    private JournalService _journalService;
-
+    private JournalService journalService;
     @Autowired
-    private MachinesService _machinesService;
+    private MachinesService machinesService;
 
+    /**
+     * Processes getting request for journal list page
+     * @param page current page (actual page -1)
+     * @param perPage page size
+     * @param machineId selected machine identifier
+     * @param machineName machine search name (if machine is not selected)
+     * @param requestType request type of the journal records
+     * @param succeed is request succeed
+     * @param contentType content type of the journal record
+     * @param codeNumber response's code number of the journal record
+     * @param outcoming if request is out coming
+     * @param sentFrom sent time from
+     * @param sentTo sent time until
+     * @param orderByDateAscending if order by date ascending is selected
+     * @param model page model
+     * @return route for the journal list
+     */
     @GetMapping
     public String getJournalRecords(
             @RequestParam(name = "page", defaultValue = "0", required = false) Integer page,
@@ -45,10 +61,10 @@ public class JournalController {
         Page<JournalInfoView> journalInfoView = null;
 
         if (machineId != null) {
-            Machine machine = _machinesService.getMachineByID(machineId);
+            Machine machine = machinesService.getMachineByID(machineId);
             model.addAttribute("selectedMachine", machine);
 
-            journalInfoView = _journalService.getJournalData(page, perPage,
+            journalInfoView = journalService.getJournalData(page, perPage,
                     machineId,
                     requestType,
                     succeed,
@@ -60,7 +76,7 @@ public class JournalController {
                     orderByDateAscending);
         }
         if (journalInfoView == null)
-            journalInfoView = _journalService.getJournalData(page, perPage,
+            journalInfoView = journalService.getJournalData(page, perPage,
                     machineName,
                     requestType,
                     succeed,

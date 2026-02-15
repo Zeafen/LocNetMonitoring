@@ -141,8 +141,8 @@ public class Machine {
         machine.setName(this.name);
         machine.setAddress(this.address);
         machine.setSerialNumber(this.serialNumber);
-        machine.setDateProduced(this.dateProduced.toLocalDateTime());
-        machine.setDateCommissioning(this.dateCommissioning.toLocalDateTime());
+        machine.setDateProduced(this.dateProduced == null ? null : this.dateProduced.toLocalDateTime());
+        machine.setDateCommissioning(this.dateCommissioning == null ? null : this.dateCommissioning.toLocalDateTime());
         machine.setModel(this.model);
         return machine;
     }

@@ -1,6 +1,8 @@
 package com.zeafen.LocNetMonitoring.domain.models.entity;
 
+import com.zeafen.LocNetMonitoring.domain.models.BufferType;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import org.hibernate.annotations.UuidGenerator;
 
@@ -33,6 +35,10 @@ public class Buffer {
     @Column(name = "buffer_type", nullable = false, columnDefinition = "SMALLINT")
     @Min(0)
     private Short bufferType;
+
+    @Column(name = "danger", nullable = false, columnDefinition = "SMALLINT")
+    @Min(0)
+    private Short danger;
 
     public OffsetDateTime getDateGenerated() {
         return dateGenerated;
@@ -80,5 +86,13 @@ public class Buffer {
 
     public void setId(UUID id) {
         this.id = id;
+    }
+
+    public Short getDanger() {
+        return danger;
+    }
+
+    public void setDanger(Short danger) {
+        this.danger = danger;
     }
 }

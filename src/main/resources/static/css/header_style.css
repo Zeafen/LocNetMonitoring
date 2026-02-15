@@ -55,7 +55,6 @@
     font-weight: 600;
 }
 
-/* Main Navigation */
 .main-nav {
     padding: 0 30px;
 }
@@ -103,7 +102,6 @@
     margin-left: 5px;
 }
 
-/* Responsive Design */
 @media (max-width: 992px) {
     .nav-list {
         flex-wrap: wrap;

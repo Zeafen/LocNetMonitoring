@@ -12,6 +12,7 @@ import java.util.Objects;
 public class FieldsComparingValidator implements ConstraintValidator<FieldsCompare, Object> {
     private String greaterField;
     private String lesserField;
+    private Boolean reverseComparing;
     private String message;
 
     @Override
@@ -22,11 +23,11 @@ public class FieldsComparingValidator implements ConstraintValidator<FieldsCompa
         boolean isValid = false;
         if (greaterValue != null && lesserValue != null) {
             if (greaterValue instanceof LocalDateTime greaterDate && lesserValue instanceof LocalDateTime lesserDate)
-                isValid = lesserDate.isBefore(greaterDate);
+                isValid = reverseComparing ? lesserDate.isAfter(greaterDate) : lesserDate.isBefore(greaterDate);
             else if (greaterValue instanceof Integer greaterNum && lesserValue instanceof Integer lesserNum)
-                isValid = lesserNum < greaterNum;
+                isValid = reverseComparing ? lesserNum > greaterNum : lesserNum < greaterNum;
             else if (greaterValue instanceof BigDecimal greaterNum && lesserValue instanceof BigDecimal lesserNum)
-                isValid = lesserNum.compareTo(greaterNum) < 0;
+                isValid = reverseComparing ? lesserNum.compareTo(greaterNum) > 0 : lesserNum.compareTo(greaterNum) < 0;
         } else if (greaterValue != null || lesserValue != null) {
             isValid = true;
         }
@@ -45,5 +46,6 @@ public class FieldsComparingValidator implements ConstraintValidator<FieldsCompa
         greaterField = constraintAnnotation.greaterField();
         lesserField = constraintAnnotation.lesserField();
         message = constraintAnnotation.message();
+        reverseComparing = constraintAnnotation.comparingDirection() == ComparingDirection.Reverse;
     }
 }

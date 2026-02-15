@@ -20,12 +20,25 @@ import java.time.ZoneOffset;
 @Controller
 public class HomePageController {
     @Autowired
-    private BufferService _bufferService;
+    private BufferService bufferService;
     @Autowired
-    private MachinesService _machinesService;
+    private MachinesService machinesService;
     @Autowired
-    private MaintenanceService _maintenanceService;
+    private MaintenanceService maintenanceService;
 
+    /**
+     * Processes get request for home page (buffer list)
+     * @param page current page (actual page -1)
+     * @param perPage page size
+     * @param machineId selected machine identifier
+     * @param maintenanceId selected maintenance identifier
+     * @param dateFrom date generated from
+     * @param dateUntil date generated until
+     * @param isRead is buffer read
+     * @param bufferType buffer type
+     * @param model page model
+     * @return route to home page
+     */
     @GetMapping
     public String getHomePage(
             @RequestParam(name = "page", defaultValue = "0", required = false) Integer page,
@@ -37,23 +50,27 @@ public class HomePageController {
             @RequestParam(name = "isRead", required = false, defaultValue = "false") Boolean isRead,
             @RequestParam(name = "type", required = false) Short bufferType,
             Model model) {
-        Page<Buffer> buffer = _bufferService.getBufferFiltered(page, perPage,
+        Page<Buffer> buffer = bufferService.getBufferFiltered(page, perPage,
                 machineId, maintenanceId,
-                dateFrom == null ? null : dateFrom.atTime(OffsetTime.of(LocalTime.MIN, ZoneOffset.UTC)),
-                dateUntil == null ? null : dateUntil.atTime(OffsetTime.of(LocalTime.MAX, ZoneOffset.UTC)),
+                dateFrom == null
+                        ? null
+                        : dateFrom.atTime(OffsetTime.of(LocalTime.MIN, ZoneOffset.UTC)),
+                dateUntil == null
+                        ? null
+                        : dateUntil.atTime(OffsetTime.of(LocalTime.MAX, ZoneOffset.UTC)),
                 isRead, bufferType);
 
         ///appending buffer types
         model.addAttribute("bufferTypes", BufferType.values());
         for (var type : BufferType.values()) {
             model.addAttribute(type.getParameterName() + "Count",
-                    _bufferService.getBufferTypeUnreadCount((short) type.ordinal()));
+                    bufferService.getBufferTypeUnreadCount((short) type.ordinal()));
         }
 
         if (machineId != null)
-            model.addAttribute("selectedMachine", _machinesService.getMachineByID(machineId));
+            model.addAttribute("selectedMachine", machinesService.getMachineByID(machineId));
         if (maintenanceId != null)
-            model.addAttribute("selectedMaintenance", _maintenanceService.getMaintenanceById(maintenanceId));
+            model.addAttribute("selectedMaintenance", maintenanceService.getMaintenanceById(maintenanceId));
         model.addAttribute("buffer", buffer);
         model.addAttribute("dateFrom", dateFrom);
         model.addAttribute("dateUntil", dateUntil);

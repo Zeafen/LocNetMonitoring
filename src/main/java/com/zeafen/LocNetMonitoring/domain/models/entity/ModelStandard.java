@@ -1,7 +1,9 @@
 package com.zeafen.LocNetMonitoring.domain.models.entity;
 
+import com.zeafen.LocNetMonitoring.domain.validation.FieldsCompare;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Size;
 
 import java.math.BigDecimal;
 
@@ -20,15 +22,18 @@ public class ModelStandard {
     )
     private Integer id;
 
-    @Column(nullable = false, length = 50)
-    @Min(0)
+    @Column(nullable = false, length = 50, name = "parameter_name")
+    @Size(min = 5, max = 50)
     private String parameterName;
 
-    @Column(nullable = false, precision = 10, scale = 4)
+    @Column(nullable = false, precision = 10, scale = 4, name = "suggestion_value")
     private BigDecimal suggestionValue;
 
-    @Column(nullable = false, precision = 10, scale = 4)
+    @Column(nullable = false, precision = 10, scale = 4, name = "warning_value")
     private BigDecimal warningValue;
+
+    @Column(nullable = false)
+    private Boolean greater;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "model_id", nullable = false)
@@ -72,5 +77,13 @@ public class ModelStandard {
 
     public void setModel(final MachineModel model) {
         this.model = model;
+    }
+
+    public Boolean getGreater() {
+        return greater;
+    }
+
+    public void setGreater(Boolean greater) {
+        this.greater = greater;
     }
 }

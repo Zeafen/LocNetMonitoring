@@ -98,8 +98,8 @@ public class MaintenanceRecords {
         var maintenanceRecord = new MaintenanceRecordUiModel();
         maintenanceRecord.setMaintenance(this.maintenance);
         maintenanceRecord.setId(this.id);
-        maintenanceRecord.setDateFinished(this.dateFinished.toLocalDateTime());
-        maintenanceRecord.setDateStarted(this.dateStarted.toLocalDateTime());
+        maintenanceRecord.setDateFinished(this.dateFinished == null ? null : this.dateFinished.toLocalDateTime());
+        maintenanceRecord.setDateStarted(this.dateStarted == null ? null : this.dateStarted.toLocalDateTime());
         maintenanceRecord.setMachine(this.machine);
         maintenanceRecord.setReason(this.reason);
         maintenanceRecord.setStatus(this.status);

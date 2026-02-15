@@ -115,6 +115,7 @@ public class BufferRepositoryTests {
         buffer1.setDateGenerated(baseDate);
         buffer1.setRead(false);
         buffer1.setBufferType((short) 1);
+        buffer1.setDanger((short) 1);
         entityManager.persist(buffer1);
 
         // Buffer 2: machine1, maintenance2, date=dateAfter, isRead=true, type=1
@@ -124,6 +125,7 @@ public class BufferRepositoryTests {
         buffer2.setDateGenerated(dateAfter);
         buffer2.setRead(true);
         buffer2.setBufferType((short) 1);
+        buffer2.setDanger((short) 0);
         entityManager.persist(buffer2);
 
         // Buffer 3: machine2, null maintenance, date=dateBefore, isRead=false, type=2
@@ -133,6 +135,7 @@ public class BufferRepositoryTests {
         buffer3.setDateGenerated(dateBefore);
         buffer3.setRead(false);
         buffer3.setBufferType((short) 2);
+        buffer3.setDanger((short) 2);
         entityManager.persist(buffer3);
 
         // Buffer 4: machine2, maintenance1, date=baseDate, isRead=false, type=2
@@ -142,6 +145,7 @@ public class BufferRepositoryTests {
         buffer4.setDateGenerated(baseDate);
         buffer4.setRead(false);
         buffer4.setBufferType((short) 2);
+        buffer4.setDanger((short) 1);
         entityManager.persist(buffer4);
 
         // Buffer 5: machine1, maintenance1, date=dateBefore, isRead=true, type=1
@@ -151,6 +155,7 @@ public class BufferRepositoryTests {
         buffer5.setDateGenerated(dateBefore);
         buffer5.setRead(true);
         buffer5.setBufferType((short) 1);
+        buffer5.setDanger((short) 0);
         entityManager.persist(buffer5);
     }
 

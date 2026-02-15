@@ -25,6 +25,11 @@ public class JpaMachinesService implements MachinesService {
     }
 
     @Override
+    public void refreshStats() {
+        _machineStats.refreshStats();
+    }
+
+    @Override
     public Page<Machine> getMachines(int page, int perPage,
                                      @Nullable String name,
                                      @Nullable String address,
@@ -127,8 +132,8 @@ public class JpaMachinesService implements MachinesService {
     }
 
     @CacheEvict(
-            key = "machine",
-            allEntries = true
+            value = "machine",
+            key = "#id"
     )
     @Override
     public Machine getMachineByID(Integer id) {

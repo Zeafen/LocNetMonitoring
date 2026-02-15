@@ -11,10 +11,10 @@ public interface MaintenanceTypesRepository extends JpaRepository<MaintenanceTyp
     @Query(
             value = "SELECT * FROM maintenance_types AS mtct WHERE " +
                     "(:typeName IS NULL OR mtct.name LIKE %:typeName%) AND " +
-                    "(CAST(:period AS INTERVAL) IS NULL OR mtct.period = CAST(:period AS INTERVAL))",
+                    "(:period IS NULL OR mtct.period LIKE :period%)",
             countQuery = "SELECT COUNT(*) FROM maintenance_types AS mtct WHERE " +
                     "(:typeName IS NULL OR mtct.name LIKE %:typeName%) AND " +
-                    "(CAST(:period AS INTERVAL) IS NULL OR mtct.period = CAST(:period AS INTERVAL))",
+                    "(:period IS NULL OR mtct.period LIKE :period%)",
             nativeQuery = true
     )
     Page<MaintenanceType> findAllFiltered(

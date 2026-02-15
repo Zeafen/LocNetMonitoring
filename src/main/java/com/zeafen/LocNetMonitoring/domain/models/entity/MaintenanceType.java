@@ -30,7 +30,7 @@ public class MaintenanceType {
     private String period;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "maintenanceType")
-    private Collection<Maintenance> maintenances ;
+    private Collection<Maintenance> maintenances;
 
     public Short getId() {
         return id;

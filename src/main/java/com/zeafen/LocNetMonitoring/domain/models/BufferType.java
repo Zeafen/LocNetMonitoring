@@ -1,18 +1,16 @@
 package com.zeafen.LocNetMonitoring.domain.models;
 
 public enum BufferType {
-    STATS_CHANGE("Изменение статистик устройств", "statsChange", "error"),
-    UPCOMING_MAINTENANCE("Грядущие ТО", "upcomingMtc", "info"),
-    MAINTENANCE_STATUS_CHANGE("Изменение статуса устройств", "mtcStatusChange", "warning");
+    STATS_CHANGE("Изменение статистик устройств", "statsChange"),
+    UPCOMING_MAINTENANCE("Грядущие ТО", "upcomingMtc"),
+    MAINTENANCE_STATUS_CHANGE("Изменение статуса устройств", "mtcStatusChange");
 
     private final String displayName;
     private final String parameterName;
-    private final String warningLevel;
 
-    BufferType(String displayName, String parameterName, String warningLevel) {
+    BufferType(String displayName, String parameterName) {
         this.displayName = displayName;
         this.parameterName = parameterName;
-        this.warningLevel = warningLevel;
     }
 
     public String getDisplayName() {
@@ -21,9 +19,5 @@ public enum BufferType {
 
     public String getParameterName() {
         return parameterName;
-    }
-
-    public String getWarningLevel() {
-        return warningLevel;
     }
 }

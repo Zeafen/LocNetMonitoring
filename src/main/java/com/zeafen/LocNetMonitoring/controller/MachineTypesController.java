@@ -23,10 +23,10 @@ import java.util.Map;
 @RequestMapping("/types")
 public class MachineTypesController {
     @Autowired
-    private MachineTypesService _machineTypes;
+    private MachineTypesService machineTypes;
 
     @Autowired
-    private RequestCodesService _requestCodesService;
+    private RequestCodesService requestCodesService;
 
     /// Machine types segment ///
     @GetMapping
@@ -37,12 +37,12 @@ public class MachineTypesController {
             @RequestParam(name = "selectedType", required = false) Short selectedTypeId,
             Model model
     ) {
-        Page<MachineType> types = _machineTypes.getMachineTypes(page, perPage, name);
+        Page<MachineType> types = machineTypes.getMachineTypes(page, perPage, name);
 
         if (selectedTypeId != null) {
             MachineType type = null;
             if (selectedTypeId > 0)
-                type = _machineTypes.getMachineTypeByID(selectedTypeId);
+                type = machineTypes.getMachineTypeByID(selectedTypeId);
             if (type == null)
                 type = new MachineType();
 
@@ -53,7 +53,7 @@ public class MachineTypesController {
         return "machineTypes/list";
     }
 
-    @PreAuthorize("hasAuthority('OPERATOR')")
+    @PreAuthorize("hasAuthority('STUFF')")
     @GetMapping("/{id}")
     public String getMachineTypeInfo(
             @PathVariable(name = "id") Short id,
@@ -65,10 +65,10 @@ public class MachineTypesController {
             @RequestParam(name = "rc_selected", required = false) Short rc_selected,
             Model model
     ) {
-        MachineType type = _machineTypes.getMachineTypeByID(id);
+        MachineType type = machineTypes.getMachineTypeByID(id);
         if (type == null)
             throw new EntityNotFoundException("Machine type with id " + id.toString() + " was not found!");
-        Page<RequestCode> typeCodes = _requestCodesService.getRequestCodes(
+        Page<RequestCode> typeCodes = requestCodesService.getRequestCodes(
                 rc_page,
                 rc_perPage,
                 id,
@@ -80,7 +80,7 @@ public class MachineTypesController {
         if (rc_selected != null) {
             RequestCode code = null;
             if (rc_selected > 0)
-                code = _requestCodesService.getRequestCodeByID(rc_selected);
+                code = requestCodesService.getRequestCodeByID(rc_selected);
             if (code == null) {
                 code = new RequestCode();
                 code.setType(type);
@@ -111,7 +111,7 @@ public class MachineTypesController {
             return "redirect:/error";
         }
 
-        _machineTypes.saveMachineType(type);
+        machineTypes.saveMachineType(type);
         return "redirect:/types";
     }
 
@@ -121,18 +121,18 @@ public class MachineTypesController {
     public String deleteMachine(
             @PathVariable Short id
     ) {
-        MachineType machine = _machineTypes.getMachineTypeByID(id);
+        MachineType machine = machineTypes.getMachineTypeByID(id);
 
         if (machine == null)
             throw new EntityNotFoundException("Machine with id " + id.toString() + " was not found");
-        _machineTypes.deleteMachineType(id);
+        machineTypes.deleteMachineType(id);
         return "redirect:/machines";
     }
 
 
     ///  Request codes segment ///
     //adding codes segment
-    @PreAuthorize("hasAuthority('OPERATOR')")
+    @PreAuthorize("hasAuthority('STUFF')")
     @PostMapping("/codes/save")
     public String addCodeToMachineType(
             @Valid @ModelAttribute RequestCode code,
@@ -144,21 +144,21 @@ public class MachineTypesController {
             return "redirect:/error";
         }
 
-        _requestCodesService.saveRequestCode(code);
-        return "redirect:/machineTypes/" + code.getType().getId().toString();
+        requestCodesService.saveRequestCode(code);
+        return "redirect:/types/" + code.getType().getId().toString();
     }
 
     //Deleting request code segment
-    @PreAuthorize("hasAuthority('OPERATOR')")
+    @PreAuthorize("hasAuthority('STUFF')")
     @GetMapping("/codes/delete/{id}")
     public String deleteRequestCode(
             @PathVariable Short id
     ) {
-        RequestCode machine = _requestCodesService.getRequestCodeByID(id);
+        RequestCode machine = requestCodesService.getRequestCodeByID(id);
 
         if (machine == null)
             throw new EntityNotFoundException("Machine with id " + id.toString() + " was not found");
-        _requestCodesService.deleteRequestCode(id);
+        requestCodesService.deleteRequestCode(id);
         return "redirect:/machines";
     }
 }

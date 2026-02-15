@@ -16,14 +16,22 @@ public interface MaintenanceRecordsRepository extends JpaRepository<MaintenanceR
                     "(:machineId IS NULL OR mtcr.machine_id = :machineId) AND " +
                     "(:maintenanceId IS NULL OR mtcr.maintenance_id = :maintenanceId) AND " +
                     "(:status IS NULL OR mtcr.status = :status) AND " +
-                    "(:dateFrom IS NULL OR (mtcr.date_commissioning >= :dateFrom OR mtcr.date_finished >= :dateFrom)) AND " +
-                    "(:dateUntil IS NULL OR (mtcr.date_commissioning <= :dateUntil OR mtcr.date_finished <= :dateUntil))",
-            countQuery = "SELECT COUNT(*) FROM maintenance_records AS mtcr WHERE " +
+                    "(CAST(:dateFrom AS TIMESTAMP WITH TIME ZONE) IS NULL " +
+                    "OR (mtcr.date_commissioned >= CAST(:dateFrom AS TIMESTAMP WITH TIME ZONE) " +
+                    "OR mtcr.date_finished >= CAST(:dateFrom AS TIMESTAMP WITH TIME ZONE))) AND " +
+                    "(CAST(:dateUntil AS TIMESTAMP WITH TIME ZONE) IS NULL " +
+                    "OR (mtcr.date_commissioned <= CAST(:dateUntil AS TIMESTAMP WITH TIME ZONE) " +
+                    "OR mtcr.date_finished <= CAST(:dateUntil AS TIMESTAMP WITH TIME ZONE)))",
+            countQuery = "SELECT * FROM maintenance_records AS mtcr WHERE " +
                     "(:machineId IS NULL OR mtcr.machine_id = :machineId) AND " +
                     "(:maintenanceId IS NULL OR mtcr.maintenance_id = :maintenanceId) AND " +
                     "(:status IS NULL OR mtcr.status = :status) AND " +
-                    "(:dateFrom IS NULL OR (mtcr.date_commissioning >= :dateFrom OR mtcr.date_finished >= :dateFrom)) AND " +
-                    "(:dateUntil IS NULL OR (mtcr.date_commissioning <= :dateUntil OR mtcr.date_finished <= :dateUntil))",
+                    "(CAST(:dateFrom AS TIMESTAMP WITH TIME ZONE) IS NULL " +
+                    "OR (mtcr.date_commissioned >= CAST(:dateFrom AS TIMESTAMP WITH TIME ZONE) " +
+                    "OR mtcr.date_finished >= CAST(:dateFrom AS TIMESTAMP WITH TIME ZONE))) AND " +
+                    "(CAST(:dateUntil AS TIMESTAMP WITH TIME ZONE) IS NULL " +
+                    "OR (mtcr.date_commissioned <= CAST(:dateUntil AS TIMESTAMP WITH TIME ZONE) " +
+                    "OR mtcr.date_finished <= CAST(:dateUntil AS TIMESTAMP WITH TIME ZONE)))",
             nativeQuery = true
     )
     Page<MaintenanceRecords> findAllFiltered(

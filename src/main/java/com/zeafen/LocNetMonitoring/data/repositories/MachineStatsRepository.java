@@ -28,4 +28,10 @@ public interface MachineStatsRepository extends JpaRepository<MachineStatsView, 
             @Param("dayTo") OffsetDateTime dayTo,
             Pageable pageable
     );
+
+    @Query(
+            value = "SELECT update_device_stats();",
+            nativeQuery = true
+    )
+    void refreshStats();
 }

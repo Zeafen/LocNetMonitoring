@@ -10,39 +10,34 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.server.ui.OneTimeTokenSubmitPageGeneratingWebFilter;
 
-import java.nio.file.AccessDeniedException;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.Collections;
 
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
 public class WebSecurityConfig {
-
     @Autowired
-    private UsersService _users;
-
-    private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(12);
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return passwordEncoder;
-    }
-
+    private LocNetMonitoringAuthenticationSuccessHandler successHandler;
     @Autowired
-    public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
+    private PasswordEncoder passwordEncoder;
+    @Autowired
+    private UsersService users;
+
+    /**
+     * Configures global authentication, by setting up user session creating
+     *
+     * @param auth authentication builder
+     */
+    @Autowired
+    public void configureGlobal(AuthenticationManagerBuilder auth) {
         auth.userDetailsService(login -> {
-            StubUser user = _users.getUserByName(login);
+            StubUser user = users.getUserByName(login);
             if (user == null) {
                 throw new UsernameNotFoundException("Такой пользователь не существует");
             }
@@ -55,25 +50,29 @@ public class WebSecurityConfig {
         }).passwordEncoder(passwordEncoder);
     }
 
+    /**
+     * Configures authentication routing
+     */
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) {
         http.authorizeHttpRequests(authorizationManagerRequestMatcherRegistry -> {
-                    authorizationManagerRequestMatcherRegistry.requestMatchers("/login", "/registration").permitAll();
+                    authorizationManagerRequestMatcherRegistry.
+                            requestMatchers("/login")
+                            .permitAll();
                     authorizationManagerRequestMatcherRegistry.anyRequest().authenticated();
                 })
                 .formLogin(httpSecurityFormLoginConfigurer -> {
                     httpSecurityFormLoginConfigurer.loginPage("/login");
-                    httpSecurityFormLoginConfigurer.defaultSuccessUrl("/");
-                    httpSecurityFormLoginConfigurer.permitAll();
+                    httpSecurityFormLoginConfigurer.successHandler(successHandler);
                     httpSecurityFormLoginConfigurer.permitAll();
                 })
                 .logout(httpSecurityLogoutConfigurer -> {
-                    httpSecurityLogoutConfigurer.permitAll();
-                    httpSecurityLogoutConfigurer.disable();
-
+                    httpSecurityLogoutConfigurer
+                            .logoutUrl("/logout")
+                            .logoutSuccessUrl("/login")
+                            .permitAll();
                 });
 
         return http.build();
     }
-
 }

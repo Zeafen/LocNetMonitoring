@@ -1,5 +1,6 @@
 package com.zeafen.LocNetMonitoring;
 
+import com.zeafen.LocNetMonitoring.config.LocNetMonitoringAuthenticationSuccessHandler;
 import com.zeafen.LocNetMonitoring.config.WebSecurityConfig;
 import com.zeafen.LocNetMonitoring.controller.MachinesController;
 import com.zeafen.LocNetMonitoring.controller.MaintenanceController;
@@ -49,6 +50,8 @@ public class MaintenanceControllerTests {
     private MaintenanceService _maintenance;
     @MockitoBean
     private UsersService _users;
+    @MockitoBean
+    private LocNetMonitoringAuthenticationSuccessHandler successHandler;
 
 
     @Test

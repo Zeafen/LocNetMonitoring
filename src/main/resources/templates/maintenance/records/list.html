@@ -8,7 +8,7 @@
 </head>
 
 <body>
-<div th:replace="~{fragments/header :: header}"></div>
+<header th:replace="~{fragments/header :: header}"></header>
 <div class="container">
     <!--selected Machine and maintenance cards-->
     <div class="cards-container">
@@ -83,7 +83,7 @@
                     Применить фильтры
                 </button>
                 <a th:if="${selectedMaintenance != null and selectedMachine != null}"
-                   th:href="@{maintenance/records(
+                   th:href="@{/maintenance/records(
                      page=${records.number},
                      perPage=${records.size},
                      machine=${selectedMachine != null ? selectedMachine.id : null},
@@ -115,7 +115,7 @@
 
                     <div class="card-id" th:text="${recordItem.id}">1</div>
                     <div class="card-name"
-                         th:text="'ТО: ' + ${recordItem.maintenance.type.name} + ${recordItem.maintenance.id}"></div>
+                         th:text="'ТО: ' + ${recordItem.maintenance.maintenanceType.name} + ${recordItem.maintenance.id}"></div>
                     <div class="card-name"
                          th:text="'Устройство: ' + ${recordItem.machine.name} + '(' + ${recordItem.machine.serialNumber} + ')'"></div>
                     <div class="codes-list">
@@ -129,7 +129,7 @@
             </div>
 
             <div class="pagination">
-                <a th:href="@{maintenance/records(
+                <a th:href="@{/maintenance/records(
                      page=0,
                      perPage=${records.size},
                      machine=${selectedMachine != null ? selectedMachine.id : null},
@@ -140,7 +140,7 @@
                      dateUntil=${dateUntil})}">
                     Первая
                 </a>
-                <a th:if="${records.totalPages > 0}" th:href="@{maintenance/records(
+                <a th:if="${records.totalPages > 0}" th:href="@{/maintenance/records(
                      page=${records.totalPages-1},
                      perPage=${records.size},
                      machine=${selectedMachine != null ? selectedMachine.id : null},
@@ -170,7 +170,7 @@
                     Следующая
                 </a>
                 <a th:if="${records.hasPrevious()}"
-                   th:href="@{maintenance/records(
+                   th:href="@{/maintenance/records(
                      page=${records.number-1},
                      perPage=${records.size},
                      machine=${selectedMachine != null ? selectedMachine.id : null},

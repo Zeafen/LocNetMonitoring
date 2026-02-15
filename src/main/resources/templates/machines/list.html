@@ -241,10 +241,12 @@
         </section>
 
         <section th:if="${machineModel != null}">
-            <div th:if="${#authorization.expression('hasAuthority(''STUFF'')')}"
-                 th:replace="fragments/forms/machine_stuff :: form(${machineModel})"></div>
-            <div th:if="${#authorization.expression('hasAuthority(''OPERATOR'')')}"
-                 th:replace="fragments/forms/machine_operator :: form(${machineModel})"></div>
+            <div th:if="${#authorization.expression('hasAuthority(''STUFF'')')}">
+                <div th:replace="fragments/forms/machine_stuff :: form(${machineModel})"></div>
+            </div>
+            <div th:if="${#authorization.expression('hasAuthority(''OPERATOR'')')}">
+                <div th:replace="fragments/forms/machine_operator :: form(${machineModel})"></div>
+            </div>
         </section>
     </div>
 </div>

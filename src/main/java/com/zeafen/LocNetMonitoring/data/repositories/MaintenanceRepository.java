@@ -13,13 +13,13 @@ public interface MaintenanceRepository extends JpaRepository<Maintenance, Intege
                     "INNER JOIN maintenance_types AS mtct ON mtc.type_id = mtct.id" +
                     " WHERE " +
                     "(:typeName IS NULL OR mtct.name LIKE %:typeName%) AND " +
-                    "(CAST(:period AS INTERVAL)IS NULL OR mtct.period = CAST(:period AS INTERVAL)) AND " +
+                    "(:period IS NULL OR mtct.period LIKE %:period%) AND " +
                     "(:workDescription IS NULL OR mtc.work_description LIKE %:workDescription%)",
             countQuery = "SELECT COUNT(mtc.*) FROM maintenance AS mtc " +
                     "INNER JOIN maintenance_types AS mtct ON mtc.type_id = mtct.id" +
                     " WHERE " +
                     "(:typeName IS NULL OR mtct.name LIKE %:typeName%) AND " +
-                    "(CAST(:period AS INTERVAL) IS NULL OR mtct.period = CAST(:period AS INTERVAL)) AND " +
+                    "(:period IS NULL OR mtct.period LIKE %:period%) AND " +
                     "(:workDescription IS NULL OR mtc.work_description LIKE %:workDescription%)",
             nativeQuery = true
     )
@@ -35,13 +35,13 @@ public interface MaintenanceRepository extends JpaRepository<Maintenance, Intege
                     "INNER JOIN maintenance_types AS mtct ON mtc.type_id = mtct.id" +
                     " WHERE " +
                     "(:typeId IS NULL OR mtct.id = :typeId) AND " +
-                    "(CAST(:period AS INTERVAL) IS NULL OR mtct.period = CAST(:period AS INTERVAL)) AND " +
+                    "(:period IS NULL OR mtct.period LIKE :period%) AND " +
                     "(:workDescription IS NULL OR mtc.work_description LIKE %:workDescription%)",
             countQuery = "SELECT COUNT(mtc.*) FROM maintenance AS mtc " +
                     "INNER JOIN maintenance_types AS mtct ON mtc.type_id = mtct.id" +
                     " WHERE " +
                     "(:typeId IS NULL OR mtct.id = :typeId) AND " +
-                    "(CAST(:period AS INTERVAL) IS NULL OR mtct.period = CAST(:period AS INTERVAL)) AND " +
+                    "(:period IS NULL OR mtct.period LIKE :period%) AND " +
                     "(:workDescription IS NULL OR mtc.work_description LIKE %:workDescription%)",
             nativeQuery = true
     )

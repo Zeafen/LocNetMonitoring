@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Users</title>
+    <link rel="stylesheet" th:href="@{/css/list_styles.css}">
+</head>
+<body>
+<div class="container">
+    <div class="main-content">
+        <form class="filters-section" action="/types" method="get">
+            <h2>Поиск Пользователя</h2>
+
+            <div class="filter-group">
+                <label for="nameFilter">Имя пользователя</label>
+                <input type="text" name="name" th:value="${name}" id="nameFilter"
+                       placeholder="Введите наименование типа устройства...">
+            </div>
+
+            <div class="filter-group">
+                <label for="roleFilter">Роль пользователя</label>
+                <select id="roleFilter" name="role">
+                    <option th:selected="${role == null}">Не указано</option>
+                    <option th:each="roleItem : ${roles}" value="${roleItem.ordinal()}"
+                            th:selected="${role == roleItem.ordinal()}" th:text="${roleItem.displayName}">
+                    </option>
+                </select>
+            </div>
+        </form>
+
+        <section class="cards-section">
+            <div class="cards-container">
+                <div th:each="user : ${users}"
+                     th:data-url="@{users(user=${user.id}, name=${name}, role=${role})}"
+                     onclick="window.location.href = this.getAttribute('data-url');" class="card">
+                    <div class="card-id" th:text="${user.id}">1</div>
+                    <div class="card-name" th:text="${user.name}"></div>
+                    <div class="codes-label">
+                        <span class="code-item" th:text="${roles[user.role].displayName}"></span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section th:if="${userModel != null}">
+            <form action="#" th:object="${userModel}" class="filters-section" th:action="@{/users/save}"
+                  method="post">
+                <input type="hidden" th:field="*{id}">
+
+                <div class="filter-group">
+                    <label for="userNameInput">Имя пользователя</label>
+                    <input id="userNameInput" th:field="*{name}" type="text"/>
+                    <div th:if="${#fields.hasErrors('name')}" style="color:red;">
+                        <span th:errors="*{name}"></span>
+                    </div>
+                </div>
+
+                <div class="filter-group">
+                    <label for="roleOutput">Роль пользователя</label>
+                    <span id="roleOutput" th:text="${roles[userModel.role].displayName}"></span>
+                    <input type="hidden" th:field="*{role}">
+                </div>
+
+                <div class="filter-group">
+                    <label for="passwordInput">Пароль</label>
+                    <input type="password" th:field="*{password}"
+                           id="passwordInput"
+                           placeholder="Введите пароль"
+                           required/>
+                    <div th:if="${#fields.hasErrors('password')}" style="color:red;">
+                        <span th:errors="*{password}"></span>
+                    </div>
+                </div>
+                <button class="filter-btn" type="submit">Подтвердить</button>
+                <button class="cancel-btn" type="reset" onclick="window.location.reload();">Отменить</button>
+            </form>
+        </section>
+    </div>
+</div>
+</body>
+</html>

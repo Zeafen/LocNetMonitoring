@@ -4,12 +4,11 @@
     <meta charset="UTF-8">
     <title>Технические обслуживания (ТО)</title>
     <link rel="stylesheet" th:href="@{/css/list_styles.css}">
+    <link rel="stylesheet" th:href="@{/css/header_style.css}"/>
 </head>
 <body>
+<header th:replace="~{fragments/header :: header}"></header>
 <div class="container">
-    <header>
-        <h1>Список ТО</h1>
-    </header>
 
     <div class="main-content">
         <form class="filters-section" action="/maintenance/types" method="get">
@@ -44,34 +43,43 @@
                 <button class="filter-btn" type="submit">
                     Применить фильтры
                 </button>
+                <a th:if="${#authorization.expression('hasAuthority(''STUFF'')')}"
+                   th:href="@{/maintenance/types(
+                           page=${types.number},
+                           perPage=${types.size},
+                           type=-1,
+                           typeName=${typeName},
+                           period=${period})}">
+                    Добавить
+                </a>
             </div>
         </form>
 
         <section class="cards-section">
             <div class="cards-container">
                 <!--Show cards-->
-                <div class="card" th:each="type : ${types.content}"
-                     th:data-url="@{maintenance(type=${type.id}"
+                <div class="card" th:each="typeItem : ${types.content}"
+                     th:data-url="@{/maintenance(type=${typeItem.id})}"
                      onclick="window.location.href = this.getAttribute('data-url');">
                     <div class="pagination">
                         <a th:if="${#authorization.expression('hasAuthority(''STUFF'')')}"
                            th:href="@{/maintenance/types(
                            page=${types.number},
                            perPage=${types.size},
-                           type=${type.id},
+                           type=${typeItem.id},
                            typeName=${typeName},
                            period=${period})}">
                             Изменить
                         </a>
                         <a th:if="${#authorization.expression('hasAuthority(''STUFF'')')}"
-                           th:href="@{/maintenance/types/delete/{id}(id=${type.id})}">
+                           th:href="@{/maintenance/types/delete/{id}(id=${typeItem.id})}">
                             Удалить
                         </a>
                     </div>
-                    <div class="card-id" th:text="${type.id}">1</div>
-                    <div class="card-name" th:text="${type.name}"></div>
+                    <div class="card-id" th:text="${typeItem.id}">1</div>
+                    <div class="card-name" th:text="${typeItem.name}"></div>
                     <div class="codes-list">
-                        <span class="code-item" th:text="'Период проведения: ' + ${type.period}"></span>
+                        <span class="code-item" th:text="'Период проведения: ' + ${typeItem.period}"></span>
                     </div>
                 </div>
             </div>

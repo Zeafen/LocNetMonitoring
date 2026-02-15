@@ -38,8 +38,8 @@ public class JpaMachineModelsService implements MachineModelsService {
     }
 
     @CacheEvict(
-            key = "machineModel",
-            allEntries = true
+            value = "machineModel",
+            key = "#id"
     )
     @Override
     public MachineModel getModelById(Short id) {
@@ -56,10 +56,7 @@ public class JpaMachineModelsService implements MachineModelsService {
         _machineModels.deleteById(id);
     }
 
-    @CacheEvict(
-            key = "standards",
-            allEntries = true
-    )
+    @CacheEvict(value = "standards")
     @Override
     public Page<ModelStandard> getModelStandards(int page, int perPage, @Nullable Short modelId, @Nullable String parameterName) {
         return _modelStandards.findAllFiltered(
@@ -69,8 +66,8 @@ public class JpaMachineModelsService implements MachineModelsService {
     }
 
     @CacheEvict(
-            key = "standard",
-            allEntries = true
+            value = "standard",
+            key = "#id"
     )
     @Override
     public ModelStandard getModelStandardById(Integer id) {

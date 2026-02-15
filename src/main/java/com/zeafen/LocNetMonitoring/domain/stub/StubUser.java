@@ -58,4 +58,12 @@ public class StubUser {
     public Short getId() {
         return this.id;
     }
+
+    public StubUserUiModel toUiModel() {
+        StubUserUiModel user = new StubUserUiModel();
+        user.setId(this.id);
+        user.setName(this.name);
+        user.setRole(this.role);
+        return user;
+    }
 }

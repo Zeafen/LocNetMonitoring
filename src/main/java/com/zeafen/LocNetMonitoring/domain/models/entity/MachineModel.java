@@ -39,7 +39,7 @@ public class MachineModel {
     @Column(nullable = false, columnDefinition = "smallint")
     private Short yearsExpire;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "type_id", nullable = false)
     private MachineType type;
 

@@ -9,7 +9,7 @@
 </head>
 
 <body>
-<div th:replace="~{fragments/header :: header}"></div>
+<header th:replace="~{fragments/header :: header}"></header>
 <div class="container">
 
     <div class="tabs-container">
@@ -76,6 +76,9 @@
                     <button class="filter-btn" type="submit">
                         Применить фильтры
                     </button>
+                    <a th:href="@{/machines/stats/refresh}" class="add-btn">
+                        Обновить статистику
+                    </a>
                 </div>
             </form>
 
@@ -177,6 +180,9 @@
                     <button class="filter-btn" type="submit">
                         Применить фильтры
                     </button>
+                    <a th:href="@{/maintenance(machine=${machineModel.id})}"
+                       class="add-btn">Перейти к выбору ТО
+                    </a>
                 </div>
             </form>
 
@@ -196,7 +202,7 @@
                     <tbody>
                     <tr th:each="summary : ${maintenanceSummary.content}">
                         <td><span th:text="${summary.maintenanceId}"></span></td>
-                        <td><span th:text="${summary.machine_id}"></span></td>
+                        <td><span th:text="${summary.machineId}"></span></td>
                         <td><span th:text="${summary.typeName}"></span></td>
                         <td><span th:text="${summary.lastMaintenanceDate}"></span></td>
                         <td><span th:text="${summary.nextMaintenanceDate}"></span></td>

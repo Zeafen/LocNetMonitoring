@@ -2,65 +2,67 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <meta charset="UTF-8">
 <body>
-<div th:fragment="f<form action=" th:object="${machineModel}" class="filters-section" th:action="@{/machines/save}"
-     method="post">
-
-    <label for="machineIDInput">Идентификатор устройства</label>
-    <input id="machineIDInput" th:field="*{id}" type="number" min="0"/>
-    <div th:if="${#fields.hasErrors('id')}" style="color:red;">
-        <span th:errors="*{id}"></span>
-    </div>
-    <div class="filter-group">
-        <label for="machineNameInput">Наименование устройства</label>
-        <input id="machineNameInput" th:field="*{name}" type="text"/>
-        <div th:if="${#fields.hasErrors('name')}" style="color:red;">
-            <span th:errors="*{name}"></span>
+<div th:fragment="form(machineModel)">
+    <form action="#" th:object="${machineModel}" class="filters-section" th:action="@{/machines/save}"
+          method="post">
+        <div class=filter-group>
+            <label for="machineIDInput">Идентификатор устройства</label>
+            <input id="machineIDInput" th:field="*{id}" type="number" min="0"/>
+            <div th:if="${#fields.hasErrors('id')}" style="color:red;">
+                <span th:errors="*{id}"></span>
+            </div>
         </div>
-    </div>
 
-    <div class="filter-group">
-        <span>Адрес устройства: <span th:text="${machineModel.address}"></span></span>
-        <input th:field="*{address}" type="hidden"/>
-    </div>
-
-
-    <div class="filter-group">
-        <label for="machineSerialNumberInput">Серийный номер устройства</label>
-        <input id="machineSerialNumberInput" th:field="*{serialNumber}" type="number" step="1"/>
-        <div th:if="${#fields.hasErrors('serialNumber')}" style="color:red;">
-            <span th:errors="*{serialNumber}"></span>
+        <div class="filter-group">
+            <label for="machineNameInput">Наименование устройства</label>
+            <input id="machineNameInput" th:field="*{name}" type="text"/>
+            <div th:if="${#fields.hasErrors('name')}" style="color:red;">
+                <span th:errors="*{name}"></span>
+            </div>
         </div>
-    </div>
 
-    <div class="filter-group">
-        <label for="dateProducedFromInput">Дата сборки</label>
-        <input type="datetime-local" th:field="*{dateProduced}"
-               id="dateProducedFromInput"/>
-        <div th:if="${#fields.hasErrors('dateProduced')}" style="color:red;">
-            <span th:errors="*{dateProduced}"></span>
+        <div class="filter-group">
+            <span>Адрес устройства: <span th:text="${machineModel.address}"></span></span>
+            <input th:field="*{address}" type="hidden"/>
         </div>
-    </div>
 
-    <div class="filter-group">
-        <label for="dateCommissionedFromInput">Дата принятия в работу</label>
-        <input type="datetime-local" th:field="*{dateCommissioning}"
-               id="dateCommissionedFromInput"/>
-        <div th:if="${#fields.hasErrors('dateCommissioning')}" style="color:red;">
-            <span th:errors="*{dateCommissioning}"></span>
+
+        <div class="filter-group">
+            <label for="machineSerialNumberInput">Серийный номер устройства</label>
+            <input id="machineSerialNumberInput" th:field="*{serialNumber}" type="number" step="1"/>
+            <div th:if="${#fields.hasErrors('serialNumber')}" style="color:red;">
+                <span th:errors="*{serialNumber}"></span>
+            </div>
         </div>
-    </div>
+
+        <div class="filter-group">
+            <label for="dateProducedFromInput">Дата сборки</label>
+            <input type="datetime-local" th:field="*{dateProduced}"
+                   id="dateProducedFromInput"/>
+            <div th:if="${#fields.hasErrors('dateProduced')}" style="color:red;">
+                <span th:errors="*{dateProduced}"></span>
+            </div>
+        </div>
+
+        <div class="filter-group">
+            <label for="dateCommissionedFromInput">Дата принятия в работу</label>
+            <input type="datetime-local" th:field="*{dateCommissioning}"
+                   id="dateCommissionedFromInput"/>
+            <div th:if="${#fields.hasErrors('dateCommissioning')}" style="color:red;">
+                <span th:errors="*{dateCommissioning}"></span>
+            </div>
+        </div>
 
 
-    <input type="hidden" th:field="*{model}"/>
-    <input type="hidden" th:field="*{id}"/>
-    <button class="filter-btn" type="submit">
-        Подтвердить
-    </button>
-    <button class="cancel-btn" type="reset" onclick="window.location.reload();">
-        Отменить
-    </button>
-    </form>orm(machineModel)">
-
+        <input type="hidden" th:field="*{model}"/>
+        <input type="hidden" th:field="*{id}"/>
+        <button class="filter-btn" type="submit">
+            Подтвердить
+        </button>
+        <button class="cancel-btn" type="reset" onclick="window.location.reload();">
+            Отменить
+        </button>
+    </form>
 </div>
 </body>
 </html>

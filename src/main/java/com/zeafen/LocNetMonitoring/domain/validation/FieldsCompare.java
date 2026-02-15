@@ -1,6 +1,7 @@
 package com.zeafen.LocNetMonitoring.domain.validation;
 
 
+import com.zeafen.LocNetMonitoring.domain.stub.UserRole;
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 
@@ -18,6 +19,8 @@ public @interface FieldsCompare {
     Class<? extends Payload>[] payload() default {};
     String greaterField();
     String lesserField();
+
+    ComparingDirection comparingDirection() default ComparingDirection.Ordinal;
 
     @Target({ElementType.TYPE})
     @Retention(RetentionPolicy.RUNTIME)

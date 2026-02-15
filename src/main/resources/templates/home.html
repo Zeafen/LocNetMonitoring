@@ -9,7 +9,7 @@
 </head>
 
 <body>
-<div th:replace="~{fragments/header :: header}"></div>
+<header th:replace="~{fragments/header :: header}"></header>
 
 <div class="container">
     <div class="tabs-container">
@@ -112,12 +112,15 @@
 
             <div th:unless="${buffer.content.isEmpty()}" class="cards-container">
                 <div class="card"
-                     th:with="warningLevel=${bufferTypes[buffer.bufferType].warningLevel}"
                      th:each="bufferItem : ${buffer.content}"
-                     th:classappend="${[warningLevel]}">
-                    <div class="card-id" th:text="${bufferItem.isRead ? '' : '*Непрочитано'}"></div>
+                     th:classappend="${bufferItem.danger == 0
+                     ? 'info'
+                     : (bufferItem.danger == 1
+                        ? 'warning'
+                        : 'error')}">
+                    <div class="card-id" th:text="${bufferItem.read == true ? '' : '*Непрочитано'}"></div>
                     <div class="card-id" th:text="${bufferItem.dateGenerated}"></div>
-                    <div class="card-name" th:text="${bufferTypes[buffer.bufferType].displayName}"></div>
+                    <div class="card-name" th:text="${bufferTypes[bufferItem.bufferType].displayName}"></div>
 
                     <span class="card-text"
                           th:text="${bufferItem.machine.name} + ' ' + ${bufferItem.machine.serialNumber}"></span>
@@ -126,7 +129,7 @@
 
                     <div class="codes-label">Получить больше информации:</div>
                     <div class="codes-list">
-                        <a th:href="@{/machines/{id}(id=bufferItem.machine.id)}"
+                        <a th:href="@{/machines/{id}(id=${bufferItem.machine.id})}"
                            class="code-item">Перейти к устройству</a>
                         <a th:href="@{/maintenance/records(
                         maintenance=${bufferItem.maintenance.id},

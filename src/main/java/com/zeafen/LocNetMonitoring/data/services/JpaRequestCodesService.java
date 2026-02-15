@@ -17,10 +17,7 @@ public class JpaRequestCodesService implements RequestCodesService {
         _requestCodes = requestCodes;
     }
 
-    @CacheEvict(
-            key = "requestCodes",
-            allEntries = true
-    )
+    @CacheEvict(value = "requestCodes")
     @Override
     public Page<RequestCode> getRequestCodes(int page, int perPage, @Nullable Short typeId, @Nullable String text, @Nullable Boolean isSucceed, @Nullable Short code_number) {
         return _requestCodes.findAllFiltered(
@@ -32,10 +29,8 @@ public class JpaRequestCodesService implements RequestCodesService {
         );
     }
 
-    @CacheEvict(
-            key = "requestCode",
-            allEntries = true
-    )
+    @CacheEvict(value = "requestCode",
+            key = "#requestCode")
     @Override
     public RequestCode getRequestCodeByID(Short requestCode) {
         return _requestCodes.findById(requestCode).orElse(null);

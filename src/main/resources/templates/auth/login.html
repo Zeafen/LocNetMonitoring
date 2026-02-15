@@ -1,33 +1,103 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org">
+<html lang="en" xmlns:th="https://www.thymeleaf.org">
 <head>
-    <title>AUTH</title>
-    <script>
-        window.onload = function() {
-            var errorMessage = document.getElementById('errorMessage');
-            if (errorMessage && errorMessage.textContent.trim() !== '') {
-                alert(errorMessage.textContent);
+    <meta charset="UTF-8">
+    <title>Авторизация</title>
+    <!--    <link rel="stylesheet" th:href="@{/css/auth.css}"/>-->
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .auth-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: calc(100vh - 180px);
+            padding: 40px 20px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #34495e;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .form-control:focus {
+            border-color: #3498db;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        }
+
+        .auth-btn {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 14px 20px;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.3s;
+            margin-top: 10px;
+        }
+
+        .auth-btn:hover {
+            background-color: #2980b9;
+        }
+
+        @media (max-width: 768px) {
+            .auth-card {
+                padding: 30px 20px;
             }
-        };
-    </script>
-    <link rel="stylesheet" th:href="@{/css/auth.css}"/>
-    <link rel="stylesheet" th:href="@{/css/header_style.css}"/>
+
+            .auth-container {
+                min-height: calc(100vh - 160px);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .auth-card {
+                padding: 25px 15px;
+            }
+
+            .auth-header h1 {
+                font-size: 1.7rem;
+            }
+        }
+    </style>
 </head>
-<header class="main-header">
-    <div class="header-top">
-        <div class="logo-container">
-            <div class="logo-text">
-                <h1>LocNetMonitoring</h1>
-            </div>
-        </div>
-    </div>
-</header>
 <body>
 <div class="auth-container">
     <h3 id="errorMessage" th:text="${error_message}" style="display:none;"></h3>
     <div th:if="${param.error}">
         Неверное имя пользователя или пароль.
     </div>
+
+
     <form th:action="@{/login}" method="post">
         <div class="form-group">
             <label for="usernameInput">Имя роли</label>
@@ -39,7 +109,7 @@
                    required/>
         </div>
         <div class="form-group">
-            <label for="passwordInput">Имя роли</label>
+            <label for="passwordInput">Пароль</label>
             <input type="password"
                    name="password"
                    id="passwordInput"

@@ -5,7 +5,6 @@
 <div th:fragment="cardBody(machineType)">
     <div class="card-id" th:text="${machineType.id}">1</div>
     <div class="card-name" th:text="${machineType.name}"></div>
-    <div class="codes-label"></div>
     <div class="codes-list"
          th:each="code : ${machineType?.typeRequestCodes?.stream()?.limit(5)?.toList()}">
         <span class="code-item"

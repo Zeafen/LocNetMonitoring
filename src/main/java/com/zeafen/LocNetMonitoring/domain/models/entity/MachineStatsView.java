@@ -93,12 +93,14 @@ public class MachineStatsView {
                 comparedValue.setParameterName(key);
                 comparedValue.setLevel(WarningLevels.LOW);
 
-                var standard = standards.stream().filter(st -> Objects.equals(st.getParameterName(), key)).findFirst().orElse(null);
+                var standard = standards.stream().filter(st -> st.getParameterName().equals(key)).findFirst().orElse(null);
                 if (standard != null) {
                     BigDecimal valueDecimal = new BigDecimal(value.toString());
-                    if (valueDecimal.compareTo(standard.getWarningValue()) > 0)
+                    if (valueDecimal.compareTo(standard.getWarningValue()) > 0 && !standard.getGreater() ||
+                            valueDecimal.compareTo(standard.getWarningValue()) < 0 && standard.getGreater())
                         comparedValue.setLevel(WarningLevels.CRITICAL);
-                    else if (valueDecimal.compareTo(standard.getSuggestionValue()) > 0)
+                    else if (valueDecimal.compareTo(standard.getSuggestionValue()) > 0 && !standard.getGreater() ||
+                            valueDecimal.compareTo(standard.getSuggestionValue()) < 0 && standard.getGreater())
                         comparedValue.setLevel(WarningLevels.AVERAGE);
                 }
 

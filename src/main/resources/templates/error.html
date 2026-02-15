@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Error info</title>
+    <link rel="stylesheet" th:href="@{/css/errors_page.css}"/>
+    <link rel="stylesheet" th:href="@{/css/header_style.css}"/>
+</head>
+<body>
+<header th:replace="~{fragments/header :: header}"></header>
+<div class="error-card">
+    <div class="error-header">
+        <h1><span th:text="'Количество ошибок: ' + ${errorMessage.size()}"></span></h1>
+    </div>
+    <div class="error-intro">
+        You caused several validation violations!
+    </div>
+    <div class="error-list">
+        <ul>
+            <li th:each="error : ${errorMessage}" th:text="${error.objectName} + ' - ' + ${error.defaultMessage}"></li>
+        </ul>
+    </div>
+</div>
+</body>
+</html>

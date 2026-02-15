@@ -8,7 +8,7 @@
 </head>
 
 <body>
-    <div th:replace="~{fragments/header :: header}"></div>
+<header th:replace="~{fragments/header :: header}"></header>
 <div class="container">
 
     <div class="main-content">
@@ -68,6 +68,18 @@
                 <button class="filter-btn" type="submit">
                     Применить фильтры
                 </button>
+                <a th:if="${#authorization.expression('hasAuthority(''STUFF'')') and selectedType != null}"
+                   th:href="@{/maintenance(
+                           page=${maintenance.number},
+                           perPage=${maintenance.size},
+                           type=${selectedType != null ? selectedType.id : null},
+                           maintenance=-1,
+                           typeName=${typeName},
+                           period=${period},
+                           machine=${machineId},
+                           workDescription=${workDescription})}">
+                    Добавить объект ТО
+                </a>
             </div>
         </form>
 
@@ -95,7 +107,7 @@
                             Удалить
                         </a>
                     </div>
-                    <div th:replace="fragments/cards/maintenance :: cardBody(maintenanceRec)}"></div>
+                    <div th:replace="fragments/cards/maintenance :: cardBody(${maintenanceRec})"></div>
                 </div>
             </div>
 
@@ -159,14 +171,21 @@
             <form action="#" th:object="${selectedMaintenance}" class="filters-section" th:action="@{/maintenance/save}"
                   method="post">
                 <div class="filter-group">
+                    <div class=filter-group>
+                        <label for="idInput">Идентификатор ТО</label>
+                        <input id="idInput" th:field="*{id}" type="number" min="0"/>
+                        <div th:if="${#fields.hasErrors('id')}" style="color:red;">
+                            <span th:errors="*{id}"></span>
+                        </div>
+                    </div>
+
                     <label for="maintenanceNameInput">Описание работ</label>
                     <input id="maintenanceNameInput" th:field="*{workDescription}" type="text"/>
                     <div th:if="${#fields.hasErrors('workDescription')}" style="color:red;">
                         <span th:errors="*{workDescription}"></span>
                     </div>
                 </div>
-                <input type="hidden" th:field="*{type}"/>
-                <input type="hidden" th:field="*{id}"/>
+                <input type="hidden" th:field="*{maintenanceType}"/>
                 <button class="filter-btn" type="submit">
                     Подтвердить
                 </button>

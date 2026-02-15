@@ -1,21 +1,15 @@
 package com.zeafen.LocNetMonitoring.domain.models.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 
 import java.util.Collection;
 import java.util.Set;
 
 
+@Table
 @Entity(name = "machine_types")
 public class MachineType {
-
     @Id
     @Column(nullable = false, updatable = false, columnDefinition = "smallint")
     @SequenceGenerator(
@@ -30,7 +24,7 @@ public class MachineType {
     private Short id;
 
     @Size(min = 5, max = 25, message = "Наименование должно составлять от 5 до 25 символов")
-    @Column(nullable = false, length = 25)
+    @Column(nullable = false, length = 25, name = "name")
     private String name;
 
     @OneToMany(mappedBy = "type")

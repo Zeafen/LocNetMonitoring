@@ -8,6 +8,7 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 
 @Service
@@ -19,10 +20,7 @@ public class JpaMachineTypesService implements MachineTypesService {
     }
 
 
-    @CacheEvict(
-            key = "machineTypes",
-            allEntries = true
-    )
+    @CacheEvict(value = "machineTypes")
     @Override
     public Page<MachineType> getMachineTypes(int page, int perPage, @Nullable String name) {
         return _machineTypes.findAllByName(
@@ -31,10 +29,11 @@ public class JpaMachineTypesService implements MachineTypesService {
     }
 
     @CacheEvict(
-            key = "machineType",
-            allEntries = true
+            value = "machineType",
+            key = "#id"
     )
     @Override
+    @Transactional(readOnly = true)
     public MachineType getMachineTypeByID(Short id) {
         return _machineTypes.findById(id).orElse(null);
     }

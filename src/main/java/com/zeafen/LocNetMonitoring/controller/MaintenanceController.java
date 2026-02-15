@@ -2,7 +2,6 @@ package com.zeafen.LocNetMonitoring.controller;
 
 import com.zeafen.LocNetMonitoring.domain.models.MachineUiModel;
 import com.zeafen.LocNetMonitoring.domain.models.MaintenanceRecordUiModel;
-import com.zeafen.LocNetMonitoring.domain.models.entity.Machine;
 import com.zeafen.LocNetMonitoring.domain.models.entity.Maintenance;
 import com.zeafen.LocNetMonitoring.domain.models.entity.MaintenanceRecords;
 import com.zeafen.LocNetMonitoring.domain.models.entity.MaintenanceType;
@@ -29,10 +28,10 @@ import java.util.regex.Pattern;
 public class MaintenanceController {
 
     @Autowired
-    private MaintenanceService _maintenanceService;
+    private MaintenanceService maintenanceService;
 
     @Autowired
-    private MachinesService _machinesServices;
+    private MachinesService machinesServices;
 
     /// Getting maintenance segment ///
     @GetMapping
@@ -48,21 +47,21 @@ public class MaintenanceController {
             Model model
     ) {
         Page<Maintenance> maintenance = typeId == null
-                ? _maintenanceService.getMaintenance(
+                ? maintenanceService.getMaintenance(
                 page, perPage,
                 typeName,
                 period,
                 workDescription)
-                : _maintenanceService.getMaintenanceByType(
+                : maintenanceService.getMaintenanceByType(
                 page, perPage,
                 typeId,
                 period,
                 workDescription);
         if (typeId != null)
-            model.addAttribute("selectedType", _maintenanceService.getMaintenanceTypeById(typeId));
+            model.addAttribute("selectedType", maintenanceService.getMaintenanceTypeById(typeId));
         if (maintenanceId != null) {
             if (maintenanceId > 0)
-                model.addAttribute("selectedMaintenance", _maintenanceService.getMaintenanceById(maintenanceId));
+                model.addAttribute("selectedMaintenance", maintenanceService.getMaintenanceById(maintenanceId));
             if (maintenanceId < 0 && model.getAttribute("selectedType") instanceof MaintenanceType selectedType) {
                 Maintenance selectedMaintenance = new Maintenance();
                 selectedMaintenance.setMaintenanceType(selectedType);
@@ -88,14 +87,14 @@ public class MaintenanceController {
             @RequestParam(name = "period", required = false) String period,
             Model model
     ) {
-        Page<MaintenanceType> types = _maintenanceService.getMaintenanceTypes(
+        Page<MaintenanceType> types = maintenanceService.getMaintenanceTypes(
                 page, perPage, typeName, period
         );
 
         if (typeId != null) {
             MaintenanceType type = null;
             if (typeId > 0)
-                type = _maintenanceService.getMaintenanceTypeById(typeId);
+                type = maintenanceService.getMaintenanceTypeById(typeId);
             if (type == null)
                 type = new MaintenanceType();
             model.addAttribute("selectedType", type);
@@ -118,7 +117,7 @@ public class MaintenanceController {
             @RequestParam(name = "dateUntil", required = false) LocalDateTime dateUntil,
             Model model
     ) {
-        Page<MaintenanceRecordUiModel> records = _maintenanceService.getMaintenanceRecords(
+        Page<MaintenanceRecordUiModel> records = maintenanceService.getMaintenanceRecords(
                         page, perPage,
                         machineId,
                         maintenanceId,
@@ -129,18 +128,18 @@ public class MaintenanceController {
 
         //Identifying models
         if (machineId != null) {
-            var selectedMachine = _machinesServices.getMachineByID(machineId).totUiModel();
+            var selectedMachine = machinesServices.getMachineByID(machineId).totUiModel();
             model.addAttribute("selectedMachine", selectedMachine);
         }
         if (maintenanceId != null) {
-            var selectedMaintenance = _maintenanceService.getMaintenanceById(maintenanceId);
+            var selectedMaintenance = maintenanceService.getMaintenanceById(maintenanceId);
             model.addAttribute("selectedMaintenance", selectedMaintenance);
         }
         if (recordId != null) {
             MaintenanceRecordUiModel record = null;
             if (Pattern.compile("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$")
                     .matcher(recordId).matches())
-                record = _maintenanceService.getMaintenanceRecordById(UUID.fromString(recordId)).toUiModel();
+                record = maintenanceService.getMaintenanceRecordById(UUID.fromString(recordId)).toUiModel();
             if (record == null
                     && model.getAttribute("selectedMaintenance") instanceof Maintenance selectedMaintenance
                     && model.getAttribute("selectedMachine") instanceof MachineUiModel selectedMachine) {
@@ -170,7 +169,7 @@ public class MaintenanceController {
             return "redirect:/error";
         }
 
-        _maintenanceService.saveMaintenanceRecord(record.toEntity());
+        maintenanceService.saveMaintenanceRecord(record.toEntity());
         return "redirect:/maintenance/records";
     }
 
@@ -186,7 +185,7 @@ public class MaintenanceController {
             return "redirect:/error";
         }
 
-        _maintenanceService.saveMaintenance(maintenance);
+        maintenanceService.saveMaintenance(maintenance);
         return "redirect:/maintenance/records";
     }
 
@@ -202,7 +201,7 @@ public class MaintenanceController {
             return "redirect:/error";
         }
 
-        _maintenanceService.saveMaintenanceType(type);
+        maintenanceService.saveMaintenanceType(type);
         return "redirect:/maintenance/types";
     }
 
@@ -213,11 +212,11 @@ public class MaintenanceController {
     public String deleteMaintenance(
             @PathVariable Integer id
     ) {
-        Maintenance maintenance = _maintenanceService.getMaintenanceById(id);
+        Maintenance maintenance = maintenanceService.getMaintenanceById(id);
 
         if (maintenance == null)
             throw new EntityNotFoundException("Maintenance with id " + id.toString() + " was not found");
-        _maintenanceService.deleteMaintenance(id);
+        maintenanceService.deleteMaintenance(id);
         return "redirect:/maintenance";
     }
 
@@ -225,11 +224,11 @@ public class MaintenanceController {
     public String deleteMaintenanceRecord(
             @PathVariable UUID id
     ) {
-        MaintenanceRecords maintenance = _maintenanceService.getMaintenanceRecordById(id);
+        MaintenanceRecords maintenance = maintenanceService.getMaintenanceRecordById(id);
 
         if (maintenance == null)
             throw new EntityNotFoundException("Maintenance record with id " + id.toString() + " was not found");
-        _maintenanceService.deleteMaintenanceRecord(id);
+        maintenanceService.deleteMaintenanceRecord(id);
         return "redirect:/maintenance/records";
     }
 
@@ -238,11 +237,11 @@ public class MaintenanceController {
     public String deleteMaintenanceType(
             @PathVariable Short id
     ) {
-        MaintenanceType type = _maintenanceService.getMaintenanceTypeById(id);
+        MaintenanceType type = maintenanceService.getMaintenanceTypeById(id);
 
         if (type == null)
             throw new EntityNotFoundException("Maintenance type with id " + id.toString() + " was not found");
-        _maintenanceService.deleteMaintenanceType(id);
+        maintenanceService.deleteMaintenanceType(id);
         return "redirect:/maintenance/records";
     }
 }
