@@ -1,6 +1,7 @@
 package com.zeafen.LocNetMonitoring;
 
 import com.zeafen.LocNetMonitoring.config.LocNetMonitoringAuthenticationSuccessHandler;
+import com.zeafen.LocNetMonitoring.config.PasswordEncoderConfiguration;
 import com.zeafen.LocNetMonitoring.config.WebSecurityConfig;
 import com.zeafen.LocNetMonitoring.controller.MachinesController;
 import com.zeafen.LocNetMonitoring.domain.models.entity.Machine;
@@ -22,13 +23,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.web.config.EnableSpringDataWebSupport;
-import org.springframework.http.MediaType;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
@@ -42,24 +42,26 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(MachinesController.class)
 @AutoConfigureMockMvc
-@Import(WebSecurityConfig.class)
+@Import({PasswordEncoderConfiguration.class, WebSecurityConfig.class})
 @EnableSpringDataWebSupport
 public class MachinesControllerTests {
 
     @Autowired
     private MockMvc mockMvc;
     @MockitoBean
-    private MachinesService _machines;
+    private MachinesService machines;
     @MockitoBean
-    private MachineModelsService _models;
+    private MachineModelsService models;
     @MockitoBean
-    private MachineTypesService _types;
+    private MachineTypesService types;
     @MockitoBean
-    private MaintenanceService _maintenance;
+    private MaintenanceService maintenance;
     @MockitoBean
-    private UsersService _users;
+    private UsersService users;
     @MockitoBean
     private LocNetMonitoringAuthenticationSuccessHandler successHandler;
+    @MockitoBean
+    private PasswordEncoder passwordEncode;
 
 
     @Test
@@ -83,7 +85,7 @@ public class MachinesControllerTests {
     @Test
     void createMachine_InvalidMachine_ShouldRedirectToErrorPage() throws Exception {
         //When
-        Mockito.when(_machines.saveMachine(any(Machine.class))).thenReturn(new Machine());
+        Mockito.when(machines.saveMachine(any(Machine.class))).thenReturn(new Machine());
         var actionResult = mockMvc.perform(
                 post("/machines/save")
                         .with(csrf())
@@ -146,7 +148,7 @@ public class MachinesControllerTests {
         LocalDateTime commissionedUntil = LocalDateTime.of(2025, 2, 1, 12, 0);
 
         //When
-        Mockito.when(_machines.getMachines(
+        Mockito.when(machines.getMachines(
                         anyInt(),
                         anyInt(),
                         any(String.class),
@@ -196,7 +198,7 @@ public class MachinesControllerTests {
         expectedModel.setYearsExpire((short) 11);
 
         //When
-        Mockito.when(_machines.getMachinesByModel(
+        Mockito.when(machines.getMachinesByModel(
                         anyInt(),
                         anyInt(),
                         eq(expectedModel.getId()),
@@ -206,7 +208,7 @@ public class MachinesControllerTests {
                         any(),
                         any()))
                 .thenReturn(expectedMachines);
-        Mockito.when(_models.getModelById(eq(expectedModel.getId())))
+        Mockito.when(models.getModelById(eq(expectedModel.getId())))
                 .thenReturn(expectedModel);
 
         var actions = mockMvc.perform(
@@ -241,7 +243,7 @@ public class MachinesControllerTests {
         expectedModel.setYearsExpire((short) 11);
 
         //When
-        Mockito.when(_machines.getMachinesByModel(
+        Mockito.when(machines.getMachinesByModel(
                         anyInt(),
                         anyInt(),
                         eq(expectedModel.getName()),
@@ -251,7 +253,7 @@ public class MachinesControllerTests {
                         any(),
                         any()))
                 .thenReturn(expectedMachines);
-        Mockito.when(_models.getModelById(eq(expectedModel.getId())))
+        Mockito.when(models.getModelById(eq(expectedModel.getId())))
                 .thenReturn(expectedModel);
 
         var actions = mockMvc.perform(
@@ -281,7 +283,7 @@ public class MachinesControllerTests {
         expectedType.setId((short) 1);
 
         //When
-        Mockito.when(_machines.getMachinesByType(
+        Mockito.when(machines.getMachinesByType(
                         anyInt(),
                         anyInt(),
                         eq(expectedType.getId()),
@@ -291,7 +293,7 @@ public class MachinesControllerTests {
                         any(),
                         any()))
                 .thenReturn(expectedMachines);
-        Mockito.when(_types.getMachineTypeByID(eq(expectedType.getId())))
+        Mockito.when(types.getMachineTypeByID(eq(expectedType.getId())))
                 .thenReturn(expectedType);
 
         var actions = mockMvc.perform(
@@ -321,7 +323,7 @@ public class MachinesControllerTests {
         expectedType.setId((short) 1);
 
         //When
-        Mockito.when(_machines.getMachinesByType(
+        Mockito.when(machines.getMachinesByType(
                         anyInt(),
                         anyInt(),
                         eq(expectedType.getName()),

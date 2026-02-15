@@ -1,6 +1,7 @@
 package com.zeafen.LocNetMonitoring;
 
 import com.zeafen.LocNetMonitoring.config.LocNetMonitoringAuthenticationSuccessHandler;
+import com.zeafen.LocNetMonitoring.config.PasswordEncoderConfiguration;
 import com.zeafen.LocNetMonitoring.config.WebSecurityConfig;
 import com.zeafen.LocNetMonitoring.controller.MachinesController;
 import com.zeafen.LocNetMonitoring.controller.MaintenanceController;
@@ -20,6 +21,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.web.config.EnableSpringDataWebSupport;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -37,7 +39,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(MaintenanceController.class)
 @AutoConfigureMockMvc
-@Import(WebSecurityConfig.class)
+@Import({PasswordEncoderConfiguration.class, WebSecurityConfig.class})
 @EnableSpringDataWebSupport
 public class MaintenanceControllerTests {
     @Autowired
@@ -52,6 +54,8 @@ public class MaintenanceControllerTests {
     private UsersService _users;
     @MockitoBean
     private LocNetMonitoringAuthenticationSuccessHandler successHandler;
+    @MockitoBean
+    private PasswordEncoder passwordEncode;
 
 
     @Test
