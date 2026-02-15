@@ -49,7 +49,7 @@
     <div th:if="${stats != null}" class="tab-content" id="stats-tab">
         <div class="main-content">
             <form class="filters-section" th:action="@{/machines/{id}(id=${machineModel.id})}" method="get">
-                <h1>Поиск статистичкеских данных</h1>
+                <h1>Поиск статистических данных</h1>
 
                 <div class="filter-group">
                     <label for="dateFromFilter">Начало периода учёта</label>
@@ -163,7 +163,7 @@
     <div class="tab-content" id="mtc_summary-tab">
         <div class="main-content">
             <form class="filters-section" th:action="@{/machines/{id}(id=${machineModel.id})}" method="get">
-                <h1>Поиск статистичкеских данных</h1>
+                <h1>Поиск данных об итоге проведения  ТО</h1>
 
                 <div class="filter-group">
 
