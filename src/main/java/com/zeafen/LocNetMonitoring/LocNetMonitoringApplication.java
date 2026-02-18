@@ -9,9 +9,7 @@ import java.util.concurrent.TimeUnit;
 
 @SpringBootApplication
 public class LocNetMonitoringApplication {
-
-	public static void main(String[] args) {
-		SpringApplication.run(LocNetMonitoringApplication.class, args);
-	}
-
+    public static void main(final String[] args) {
+        SpringApplication.run(LocNetMonitoringApplication.class, args);
+    }
 }

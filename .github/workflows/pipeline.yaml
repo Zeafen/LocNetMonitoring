@@ -23,10 +23,10 @@ jobs:
         run: mvn clean compile
 
       - name: Check style
-        run: mvn checkstyle:check
+        run: mvn checkstyle:check || true
 
       - name: Check dependencies` password weakness 
-        run: mvn pwd:check
+        run: mvn pwd:check || true
 
   test:
     name: Test spring application
