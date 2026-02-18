@@ -17,6 +17,7 @@ jobs:
         uses: actions/setup-java@v5
         with:
           java-version: '17'
+
       - name: Install libs
         run: mvn clean compile
 
@@ -34,6 +35,11 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
+        with:
+          java-version: '17'
+
+      - name: Set up Java
+        uses: actions/setup-java@v5
         with:
           java-version: '17'
 
