@@ -2,7 +2,7 @@ name: Spring_check
 
 on:
   push:
-    branches: [ master]
+    branches: [ master ]
 
 jobs:
   validate:
