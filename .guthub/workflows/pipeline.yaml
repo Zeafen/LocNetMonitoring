@@ -1,0 +1,42 @@
+name: Spring_check
+
+on:
+  push:
+    branches: [ master]
+
+jobs:
+  validate:
+    name: validate_spring_project
+    runs-on: ubuntu-latest
+
+    steps: 
+      - name: checkout repository
+        uses: actions/checkout@v6
+
+      - name: Set up Java
+        uses: actions/setup-java@v5
+        with:
+          java-version: '17'
+      - name: Install libs
+        run: mvn clean compile
+
+      - name: Check style
+        run: mvn checkstyle:check
+
+      - name: Check dependencies` password weakness 
+        run: mvn pwd:check
+
+  test:
+    name: Test spring application
+    runs-on: ubuntu-latest
+    needs: validate
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          java-version: '17'
+
+      - name: Instal libs and run tests
+        run: mvn package
+

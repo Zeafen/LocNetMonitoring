@@ -1,4 +1,4 @@
-package com.zeafen.LocNetMonitoring.controller;
+package com.zeafen.LocNetMonitoring.data.controller;
 
 import com.zeafen.LocNetMonitoring.domain.models.MachineUiModel;
 import com.zeafen.LocNetMonitoring.domain.models.MaintenanceRecordUiModel;

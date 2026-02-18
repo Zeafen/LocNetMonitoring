@@ -3,7 +3,7 @@ package com.zeafen.LocNetMonitoring;
 import com.zeafen.LocNetMonitoring.config.LocNetMonitoringAuthenticationSuccessHandler;
 import com.zeafen.LocNetMonitoring.config.PasswordEncoderConfiguration;
 import com.zeafen.LocNetMonitoring.config.WebSecurityConfig;
-import com.zeafen.LocNetMonitoring.controller.MachinesController;
+import com.zeafen.LocNetMonitoring.data.controller.MachinesController;
 import com.zeafen.LocNetMonitoring.domain.models.entity.Machine;
 import com.zeafen.LocNetMonitoring.domain.models.entity.MachineModel;
 import com.zeafen.LocNetMonitoring.domain.models.entity.MachineType;

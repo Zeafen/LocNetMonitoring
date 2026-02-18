@@ -1,4 +1,4 @@
-package com.zeafen.LocNetMonitoring.controller;
+package com.zeafen.LocNetMonitoring.data.controller;
 
 import com.zeafen.LocNetMonitoring.domain.models.entity.MachineModel;
 import com.zeafen.LocNetMonitoring.domain.models.entity.MachineType;

@@ -7,6 +7,7 @@ import com.zeafen.LocNetMonitoring.domain.models.entity.ModelStandard;
 import com.zeafen.LocNetMonitoring.domain.services.MachineModelsService;
 import org.jspecify.annotations.Nullable;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -21,6 +22,7 @@ public class JpaMachineModelsService implements MachineModelsService {
         _modelStandards = modelStandards;
     }
 
+
     @Override
     public Page<MachineModel> getMachineModels(int page, int perPage, @Nullable Short typeID, @Nullable String modelName) {
         return _machineModels.findAllFiltered(
@@ -28,6 +30,7 @@ public class JpaMachineModelsService implements MachineModelsService {
                 modelName == null || modelName.isBlank() ? null : modelName,
                 PageRequest.of(page, perPage));
     }
+
 
     @Override
     public Page<MachineModel> getMachineModelsByTypeName(int page, int perPage, @Nullable String typeName, @Nullable String modelName) {
@@ -37,10 +40,6 @@ public class JpaMachineModelsService implements MachineModelsService {
                 PageRequest.of(page, perPage));
     }
 
-    @CacheEvict(
-            value = "machineModel",
-            key = "#id"
-    )
     @Override
     public MachineModel getModelById(Short id) {
         return _machineModels.findById(id).orElse(null);
@@ -56,7 +55,6 @@ public class JpaMachineModelsService implements MachineModelsService {
         _machineModels.deleteById(id);
     }
 
-    @CacheEvict(value = "standards")
     @Override
     public Page<ModelStandard> getModelStandards(int page, int perPage, @Nullable Short modelId, @Nullable String parameterName) {
         return _modelStandards.findAllFiltered(
@@ -65,10 +63,6 @@ public class JpaMachineModelsService implements MachineModelsService {
                 PageRequest.of(page, perPage));
     }
 
-    @CacheEvict(
-            value = "standard",
-            key = "#id"
-    )
     @Override
     public ModelStandard getModelStandardById(Integer id) {
         return _modelStandards.findById(id).orElse(null);

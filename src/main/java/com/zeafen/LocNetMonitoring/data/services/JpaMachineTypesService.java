@@ -5,6 +5,7 @@ import com.zeafen.LocNetMonitoring.domain.models.entity.MachineType;
 import com.zeafen.LocNetMonitoring.domain.services.MachineTypesService;
 import org.jspecify.annotations.Nullable;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -20,7 +21,6 @@ public class JpaMachineTypesService implements MachineTypesService {
     }
 
 
-    @CacheEvict(value = "machineTypes")
     @Override
     public Page<MachineType> getMachineTypes(int page, int perPage, @Nullable String name) {
         return _machineTypes.findAllByName(
@@ -28,10 +28,6 @@ public class JpaMachineTypesService implements MachineTypesService {
                 PageRequest.of(page, perPage));
     }
 
-    @CacheEvict(
-            value = "machineType",
-            key = "#id"
-    )
     @Override
     @Transactional(readOnly = true)
     public MachineType getMachineTypeByID(Short id) {

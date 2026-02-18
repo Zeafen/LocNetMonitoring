@@ -8,6 +8,9 @@ import com.zeafen.LocNetMonitoring.domain.services.MachinesService;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -131,10 +134,6 @@ public class JpaMachinesService implements MachinesService {
         );
     }
 
-    @CacheEvict(
-            value = "machine",
-            key = "#id"
-    )
     @Override
     public Machine getMachineByID(Integer id) {
         return _machines.findById(id).orElse(null);

@@ -10,6 +10,8 @@ import com.zeafen.LocNetMonitoring.domain.models.entity.MaintenanceRecords;
 import com.zeafen.LocNetMonitoring.domain.models.entity.MaintenanceType;
 import com.zeafen.LocNetMonitoring.domain.services.MaintenanceService;
 import org.jspecify.annotations.Nullable;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
